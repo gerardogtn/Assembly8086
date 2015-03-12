@@ -1,0 +1,21 @@
+1. Escriba un programa que ponga margen a la pantalla y tambien,
+una equis exactamente enmedio. El margen debe ir de un color, y la X de otro.
+
+2. Realice un programa que simule hacer el tablero de un GATO (juego).
+El tablero debe estar alineado a la derecha y equidistantes sus lineas.
+
+3. Escriba un programa que simule un par semaforos (verde, rojo, amarillo).
+Usted coloque los tiempos pero el ciclo completo debe durar 1 minuto.
+
+4. Elabore un programa que ingrese un parrafo por teclado y lo imprima
+al revez. Adicionalmente, debe indicar el numero de vocales que tuvo por
+seprado y vocales totales, asi como el numero de consonantes y/o caracteres
+extras.
+
+5. Use las interrupciones para generar un programa que, de acuerdo con la
+fecha del sistema y la fecha de ingreso de un usuario, le indique el numero
+de dias que lleva vividos.
+
+6. Elabore un programa que le indique la fecha de sistema cada vez que el
+usuario oprima la letra 'a'. cada vez que se imprima, debe cambiar el color
+en pantalla.
