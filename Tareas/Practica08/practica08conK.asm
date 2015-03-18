@@ -146,8 +146,8 @@ INSERTARDIGITO:
         CALL TECLA
         SUB AL, 30H             ;CONVERTIR ASCII A DECIMAL
         
-        MOV [SI], AL
-        INC SI
+        MOV  [SI], AL
+        INC  SI
         LOOP INSERTARDIGITO
 
         MOV SI, 1300H
@@ -243,7 +243,7 @@ NINE:
         JMP NEXT
 
 NOTNUMBER:
-        VIDEO SLASH,     printrow, 2
+        VIDEO printSlash, printrow, 2
         
         
 NEXT:
