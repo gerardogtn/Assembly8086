@@ -49,86 +49,86 @@ AB:     MOV AH, 02
         .DATA
         ;; CADA BLOQUE CUENTA ES UNA MATRIZ DE 5X5.
         ;; EN TOTAL CADA BLOQUE TIENE 25 ELEMENTOS
-        printZero  BYTE '00000'
-                   BYTE '0   0'
-                   BYTE '0   0'
-                   BYTE '0   0'
-                   BYTE '00000'
+        printZero  DB '00000'
+                   DB '0   0'
+                   DB '0   0'
+                   DB '0   0'
+                   DB '00000'
 
-        printOne   BYTE '  11 '
-                   BYTE '   1 '
-                   BYTE '   1 '
-                   BYTE '   1 '
-                   BYTE '11111'
+        printOne   DB '  11 '
+                   DB '   1 '
+                   DB '   1 '
+                   DB '   1 '
+                   DB '11111'
 
-        printTwo   BYTE '22222'
-                   BYTE '    2'
-                   BYTE '22222'
-                   BYTE '2    '
-                   BYTE '22222'
+        printTwo   DB '22222'
+                   DB '    2'
+                   DB '22222'
+                   DB '2    '
+                   DB '22222'
         
         
-        printThree BYTE '33333'
-                   BYTE '    3'
-                   BYTE '  333'
-                   BYTE '    3'
-                   BYTE '33333'
+        printThree DB '33333'
+                   DB '    3'
+                   DB '  333'
+                   DB '    3'
+                   DB '33333'
 
 
-        printFour  BYTE '4   4'
-                   BYTE '4   4'
-                   BYTE '44444'
-                   BYTE '    4'
-                   BYTE '    4'
+        printFour  DB '4   4'
+                   DB '4   4'
+                   DB '44444'
+                   DB '    4'
+                   DB '    4'
 
 
-        printFive  BYTE '55555'
-                   BYTE '5    '
-                   BYTE '55555'
-                   BYTE '    5'
-                   BYTE '55555'
+        printFive  DB '55555'
+                   DB '5    '
+                   DB '55555'
+                   DB '    5'
+                   DB '55555'
 
-        printSix   BYTE '6    '
-                   BYTE '6    '
-                   BYTE '66666'
-                   BYTE '6   6'
-                   BYTE '66666'
+        printSix   DB '6    '
+                   DB '6    '
+                   DB '66666'
+                   DB '6   6'
+                   DB '66666'
 
-        printSeven BYTE '77777'
-                   BYTE '    7'
-                   BYTE '    7'
-                   BYTE '    7'
-                   BYTE '    7'
+        printSeven DB '77777'
+                   DB '    7'
+                   DB '    7'
+                   DB '    7'
+                   DB '    7'
 
-        printEight BYTE '88888'
-                   BYTE '8   8'
-                   BYTE '88888'
-                   BYTE '8   8'
-                   BYTE '88888'
+        printEight DB '88888'
+                   DB '8   8'
+                   DB '88888'
+                   DB '8   8'
+                   DB '88888'
 
-        printNine  BYTE '99999'
-                   BYTE '9   9'
-                   BYTE '99999'
-                   BYTE '    9'
-                   BYTE '    9'
+        printNine  DB '99999'
+                   DB '9   9'
+                   DB '99999'
+                   DB '    9'
+                   DB '    9'
 
-        printSlash BYTE '    /'
-                   BYTE '   / '
-                   BYTE '  /  '
-                   BYTE ' /   '
-                   BYTE '/    '
+        printSlash DB '    /'
+                   DB '   / '
+                   DB '  /  '
+                   DB ' /   '
+                   DB '/    '
         
-        password      BYTE 'GGJVSRGCJR', 0
-        passwordInput BYTE '          ', 0
+        password      DB 'GGJVSRGCJR', 0
+        passwordInput DB '          ', 0
 
-        welcome BYTE 'Bienvenido al temporizador',      0
-        minuteS BYTE 'Inserte el numero de minutos: ',  0
-        secondS BYTE 'Inserte el numero de segundos: ', 0
+        welcome DB 'Bienvenido al temporizador',      0
+        minuteS DB 'Inserte el numero de minutos: ',  0
+        secondS DB 'Inserte el numero de segundos: ', 0
 
-        minute BYTE 0
-        second BYTE 0
+        minute DB 0
+        second DB 0
 
-        printrow BYTE 2
+        printrow DB 2
 
         .CODE
 
@@ -266,9 +266,9 @@ GETPASSWORD PROC
 INSERTARPASSWORD:
         MOV AH, 01
 
-AC:
+AD:
         INT 16H                 ;INSERTAR NUEVA TECLA SI LA TECLA
-        JZ AC                   ;INSERTADA NO ES VALIDA
+        JZ AD                   ;INSERTADA NO ES VALIDA
         
         MOV AH, 00              ;RECIBIR INFO DEL TECLADO, GUARDAR
         INT 16H                 ;EN AL
