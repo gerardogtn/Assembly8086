@@ -2,6 +2,8 @@
 ;;; fecha del sistema y la fecha de ingreso de un usuario, le indique el numero
 ;;; de dias que lleva vividos.
 
+;;; OUTPUT SHOULD BE 7663
+        
         ORG 100H
 
         .DATA
@@ -29,18 +31,17 @@
 
         call getDate            ;Store date variables. 
         
-        mov deltaYear, currentYear
-        sub deltaYear, yearOfBirth ;Calculate year delta.
 
-        call MonthDifference
+        call yearDifference
+        call monthDifference
+        call dayDifference
 
-        call DayDifference
+        call yearToDay
+        call monthToDay
+        add output, deltaDay
 
-        mov ax, 365
-        mul ax, deltaYear
-        mov output, ax
-
-        mov ah, 000H
+        
+        mov ah, 00000H
         mov al, 12
         mul ax, deltaMonth
         add output, ax
@@ -69,7 +70,16 @@
         RET
         getDate ENDP
 
+        ;; CALCULATE DELTA YEAR PROCEDURE ********************
+        ;; Calculate the year difference
+        yearDifference PROC
 
+        mov deltaYear, currentYear
+        sub deltaYear, yearOfBirth ;Calculate year delta.
+
+        RET
+        yearDifference ENDP
+        
 
         ;; CALCULATE DELTA MONTH PROCEDURE ********************
         ;; Calculate the month difference
@@ -98,9 +108,9 @@ MONTHOFBIRTHISGREATER:
 
 
         ;; CALCULATE DELTA DAY PROCEDURE ********************
-        ;; Calculate the month difference
+        ;; Calculate the day difference
         
-        monthDifference PROC
+        dayDifference PROC
         CMP currentDay, dayOfBirth
         JNG DATEOFBIRTHISGREATER
         
@@ -120,8 +130,18 @@ DATEOFBIRTHISGREATER:
 
 
         RET
-        monthDifference ENDP
+        dayDifference ENDP
 
+        ;; YEAR TO DAY PROCEDURE *************************
+        ;; Multiply years * 365 and store in output. 
+        yearToDay PROC
+        
+        mov ax, 365
+        mul ax, deltaYear
+        mov output, ax
+        
+        RET
+        yearToDay ENDP
 
 
         END main
