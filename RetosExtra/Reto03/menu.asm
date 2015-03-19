@@ -1,4 +1,6 @@
 printStrings MACRO MSG, ROW, COL
+        LOCAL printLoop
+        LOCAL printExit
         MOV SI, 00              ;INDICE DE CADENA EN 0
 
         MOV BH, 00
@@ -69,8 +71,8 @@ displayMenu PROC
 
         ;; IMPRIMIR OPCIONES DE MENU
         printStrings printMenu,          8, 37
-        printStrings printCronometro,   12,  2
-        printStrings printTemporizador, 16,  2
+        printStrings printTemporizador, 12,  2
+        printStrings printCronometro,   16,  2
         printStrings printSalir,        20,  2
 
         
@@ -137,23 +139,22 @@ insertarOpcion ENDP
 
         
 temporizador PROC
-
-
-
+        printStrings printTemporizador, 14,  2 ;stub
+        
         RET
 temporizador ENDP
-
+        
 
 
 cronometro PROC
-
+        printStrings printCronometro,   18,  2 ;stub
         RET
 cronometro ENDP
 
 
 salir PROC
 
-
+        printStrings printSalir,        20,  2 ;stub
         RET
 salir ENDP
 
