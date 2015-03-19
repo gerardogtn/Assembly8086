@@ -44,6 +44,8 @@ printStrings ENDM
         printTemporizador DB '2: Temporizador', 0
         ;; LENGTH: 8
         printSalir        DB '3: Salir',        0
+
+        opcionSeleccionada DB 0
         
 
 
@@ -65,9 +67,6 @@ main ENDP
 
 displayMenu PROC
 
-        ;; IMPRIMIR MENSAJE DE BIENVENIDA
-        printStrings mensajeBienvenida, 2, 20
-
         ;; IMPRIMIR OPCIONES DE MENU
         printStrings printMenu,          8, 37
         printStrings printCronometro,   12,  2
@@ -82,13 +81,61 @@ displayMenu ENDP
 
 
 selectOption PROC
+        call insertarOpcion
 
+        CMP opcionSeleccionada, 1
+        JNZ optionTwo
+        CALL temporizador
+        RET
 
+optionTwo:
+        CMP opcionSeleccionada, 2
+        JNZ optionThree
+        CALL cronometro
+        RET
+        
+
+optionThree:
+        CMP opcionSeleccionada, 3
+        JNZ exit
+        CALL salir
+        RET
+
+exit:
+        
 
         RET
 selectOption ENDP        
 
+insertarOpcion PROC
+        ;; Ajustar posicion del cursor
+        MOV DH, 24
+        MOV DL, 46
 
+        ;; Ajustar color de los valores a insertar
+        MOV BH, 00
+        MOV BL, 0F0H
+
+        ;; Recibir valores del teclado
+        MOV AH, 01
+teclaValida:
+        INT 16H
+        JZ teclaValida
+
+        MOV AH, 00
+        INT 16H
+
+        MOV AH, 0EH
+        INT 10H
+
+        SUB AL, 30H             ;CONVERTIR ASCII A DECIMAL
+        
+        MOV opcionSeleccionada, AL 
+
+        RET
+insertarOpcion ENDP
+
+        
 temporizador PROC
 
 
@@ -102,3 +149,12 @@ cronometro PROC
 
         RET
 cronometro ENDP
+
+
+salir PROC
+
+
+        RET
+salir ENDP
+
+        
