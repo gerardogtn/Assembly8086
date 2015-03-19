@@ -10,7 +10,7 @@
         MOV DI, 1               ;CONTADOR DE FILAS (MAX 5)
 
         MOV BH, 00
-        MOV BL 0F0H             ;FONDO BLANCO, LETRA NEGRA.
+        MOV BL, 0F0H             ;FONDO BLANCO, LETRA NEGRA.
         
         MOV DH, REN             ;UBICAR CURSOR EN POSICION (COL, REN)
         MOV DL, COL
@@ -124,6 +124,7 @@ AB:     MOV AH, 02
         welcome DB 'Bienvenido al temporizador',      0
         minuteS DB 'Inserte el numero de minutos: ',  0
         secondS DB 'Inserte el numero de segundos: ', 0
+        minuteSecondS DB '  /  ', 0
 
         minute DB 0
         second DB 0
@@ -136,14 +137,14 @@ AB:     MOV AH, 02
 main PROC
         
         MOV AH, 00              ;INITIALIZE VIDEO MODE
-        MOV AH, 03H
+        MOV AL, 03H
         INT 10H
 
-        MOV SI, 1300H
-        
+        MOV SI,  0
         MOV CX, 05              ;INSERTAR 5 DIGITOS. 
 INSERTARDIGITO:
         CALL TECLA
+        MOV minuteSecondS[SI]
         SUB AL, 30H             ;CONVERTIR ASCII A DECIMAL
         
         MOV  [SI], AL

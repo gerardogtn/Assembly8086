@@ -1,0 +1,13 @@
+Elabore un programa que despliegue y ejecute el
+siguiente menu:
+
+1) Cronometro
+2) Temporizador
+3) Salir.
+
+
+A) PARA EL CRON'OMETRO QUE INICIE EN CERO Y
+PARE CUANDO EL USUARIO OPRIMA ENTER.
+SI OPRIME S CONTINUA Y R LO SACA AL MENU PRINCIPAL
+
+B) EL TEMPORIZADOR SOLO INGRESA EL VALOR Y LO EJECUTA. 
