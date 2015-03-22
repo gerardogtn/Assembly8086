@@ -19,8 +19,15 @@
         deltaMonth    DB 0
         deltaDay      DB 0
 
-        output        DW 0     
+        isCurrentMonthGreaterThanBirthMonth DB 0
+        
+        output        DW 0
+        outputstring  DB "     ", 0
 
+        daysPerMonth DW  31,  61,  92, 122, 153, 183
+                     DW 214, 245, 275, 306, 336, 365
+
+        temporal DW 0
         
         .CODE
 
@@ -39,14 +46,8 @@
         call yearToDay
         call monthToDay
         add output, deltaDay
-
+        call addLeapYears
         
-        mov ah, 00000H
-        mov al, 12
-        mul ax, deltaMonth
-        add output, ax
-
-        add output, deltaDay
         
 
         main ENDP
@@ -56,7 +57,7 @@
 
         ;;GETDATE PROCEDURE ************************************
         ;; Store date into the date variables defined in .data
-        getDate PROC
+getDate PROC
         
         ;; Get date. 
         mov ah, 2AH
@@ -68,28 +69,29 @@
         mov currentDay,   dl
 
         RET
-        getDate ENDP
+getDate ENDP
 
         ;; CALCULATE DELTA YEAR PROCEDURE ********************
         ;; Calculate the year difference
-        yearDifference PROC
+yearDifference PROC
 
         mov deltaYear, currentYear
         sub deltaYear, yearOfBirth ;Calculate year delta.
 
         RET
-        yearDifference ENDP
+yearDifference ENDP
         
 
         ;; CALCULATE DELTA MONTH PROCEDURE ********************
         ;; Calculate the month difference
         
-        monthDifference PROC
+monthDifference PROC
         CMP currentMonth, monthOfBirth
         JNG MONTHOFBIRTHISGREATER
         
         ;; IF CURRENT MONTH IS GREATER OR EQUAL TO MONTH OF BIRTH
         ;; DELTAMONTH = CURRENTMONTH - MONTHOFBIRTH
+        MOV isCurrentMonthGreaterThanBirthMonth, 1
         mov deltaMonth, currentMonth
         sub deltaMonth, monthOfBirth
         RET
@@ -104,13 +106,13 @@ MONTHOFBIRTHISGREATER:
 
 
         RET
-        monthDifference ENDP
+monthDifference ENDP
 
 
         ;; CALCULATE DELTA DAY PROCEDURE ********************
         ;; Calculate the day difference
         
-        dayDifference PROC
+dayDifference PROC
         CMP currentDay, dayOfBirth
         JNG DATEOFBIRTHISGREATER
         
@@ -130,18 +132,57 @@ DATEOFBIRTHISGREATER:
 
 
         RET
-        dayDifference ENDP
+dayDifference ENDP
 
         ;; YEAR TO DAY PROCEDURE *************************
         ;; Multiply years * 365 and store in output. 
-        yearToDay PROC
+yearToDay PROC
         
         mov ax, 365
         mul ax, deltaYear
         mov output, ax
         
         RET
-        yearToDay ENDP
+yearToDay ENDP
+
+monthToDay PROC
+        ;; If the currentMonth is gretar than monthOfBirth
+        CMP isCurrentMonthGreaterThanBirthMonth, 1
+        JZ currentMonthGreaterThanBirthMonth
+
+        mov temporal, daysPerMonth[monthOfBirth]
+        sub temporal, daysPerMonth[currentMonth]
+
+        add output, temporal
+        mov temporal, 0
+        
+        RET
+        
+        
+isCurrentMonthGreaterThanBirthMonth:
+        
+        mov temporal, daysPerMonth[currentMonth]
+        sub temporal, daysPerMonth[monthOfBirth]
+
+        add output, temporal
+        mov temporal, 0
+        
+        RET
+monthToDay ENDP
 
 
+
+                                ;ADDS LEAPDAYS
+addLeapYears PROC
+
+        MOV AX, 00
+        MOV AL, deltaYear
+        DIV AL, 4
+
+        ADD output, AH
+
+        RET
+
+addLeapYears ENDP 
+        
         END main
