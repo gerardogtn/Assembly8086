@@ -3,21 +3,54 @@
 ;;; de dias que lleva vividos.
 
 ;;; OUTPUT SHOULD BE 7663
+       
+       
+printStrings MACRO MSG, ROW, COL
+        LOCAL printLoop
+        LOCAL printExit
+        MOV SI, 00              ;INDICE DE CADENA EN 0
+
+        MOV BH, 00
+        MOV BL, 0F0H            ;FONDO BLANCO, LETRA NEGRA.
+
+        MOV DH, ROW             ;MOVER CURSOR. 
+        MOV DL, COL
+        MOV AH, 02H
+        INT 10H 
+        
+
+printLoop:
+        MOV AL, MSG[SI]
+
+        CMP AL, 0
+        JZ printExit
+        
+        MOV AH, 0EH
+        INT 10H                 ;IMPRIMIR CARACTER.
+
+        INC SI
+        JMP printLoop
+
+printExit:  
+
+printStrings ENDM        
+       
+       
         
         ORG 100H
 
         .DATA
         currentYear   DW 0
-        currentMonth  DB 0
-        currentDay    DB 0
+        currentMonth  DW 0
+        currentDay    DW 0
 
         yearOfBirth   DW 1994
-        monthOfBirth  DB 03
-        dayOfBirth    DB 24
+        monthOfBirth  DW 03
+        dayOfBirth    DW 24
 
         deltaYear     DW 0
-        deltaMonth    DB 0
-        deltaDay      DB 0
+        deltaMonth    DW 0
+        deltaDay      DW 0
 
         isCurrentMonthGreaterThanBirthMonth DB 0
         
@@ -45,10 +78,20 @@
 
         call yearToDay
         call monthToDay
-        add output, deltaDay
-        call addLeapYears
+                           
+        mov ax, output                   
+        add  ax, deltaDay
+        mov output, ax
+        ;call addLeapYears
+                
+        MOV AH, 00H
+        MOV AL, 03H
+        INT 10H
         
+        call outputToString
         
+        printStrings outputString, 13, 38       
+        RET
 
         main ENDP
 
@@ -75,9 +118,10 @@ getDate ENDP
         ;; Calculate the year difference
 yearDifference PROC
 
-        mov deltaYear, currentYear
-        sub deltaYear, yearOfBirth ;Calculate year delta.
-
+        MOV AX, currentYear
+        sub AX, yearOfBirth ;Calculate year delta.
+        MOV deltaYear, AX
+        
         RET
 yearDifference ENDP
         
@@ -86,24 +130,27 @@ yearDifference ENDP
         ;; Calculate the month difference
         
 monthDifference PROC
-        CMP currentMonth, monthOfBirth
-        JNG MONTHOFBIRTHISGREATER
+        MOV AX, monthOfBirth
+        CMP AX, currentMonth
+        JG MONTHOFBIRTHISGREATER
         
         ;; IF CURRENT MONTH IS GREATER OR EQUAL TO MONTH OF BIRTH
         ;; DELTAMONTH = CURRENTMONTH - MONTHOFBIRTH
-        MOV isCurrentMonthGreaterThanBirthMonth, 1
-        mov deltaMonth, currentMonth
-        sub deltaMonth, monthOfBirth
+        mov AX, currentMonth
+        sub AX, monthOfBirth 
+        MOV deltaMonth, AX
         RET
+        
 
         ;; IF CURRENTMONTH IS LESS THAN MONTH OF BIRTH
         ;; DELTAYEAR--
         ;; DELTAMONTH = MONTHOFBIRTH - CURRENTMONTH
-MONTHOFBIRTHISGREATER:  
-        dec deltaYear
-        mov deltaMonth, monthOfBirth
-        sub deltaMonth, currentMonth
-
+MONTHOFBIRTHISGREATER: 
+        MOV isCurrentMonthGreaterThanBirthMonth, 1 
+        dec deltaYear   
+        mov AX, monthOfBirth
+        sub AX, currentMonth
+        MOV deltaMonth, AX
 
         RET
 monthDifference ENDP
@@ -112,24 +159,27 @@ monthDifference ENDP
         ;; CALCULATE DELTA DAY PROCEDURE ********************
         ;; Calculate the day difference
         
-dayDifference PROC
-        CMP currentDay, dayOfBirth
-        JNG DATEOFBIRTHISGREATER
+dayDifference PROC 
+        MOV AX, dayOfBirth 
+        CMP AX, currentDay
+        JG DATEOFBIRTHISGREATER
         
         ;; IF CURRENT MONTH IS GREATER OR EQUAL TO MONTH OF BIRTH
         ;; DELTAMONTH = CURRENTMONTH - MONTHOFBIRTH
-        mov deltaDay, currentDay
-        sub deltaDay, dayOfBirth
+        mov AX, currentDay
+        sub AX, dayOfBirth     
+        MOV deltaDay, AX
         RET
 
         ;; IF CURRENTMONTH IS LESS THAN MONTH OF BIRTH
         ;; DELTAYEAR--
         ;; DELTAMONTH = MONTHOFBIRTH - CURRENTMONTH
 DATEOFBIRTHISGREATER:  
-        dec deltaMonth
-        mov deltaDay, dayOfBirth
-        sub deltaDay, currentDay
-
+        dec deltaMonth 
+        MOV AX, deltaDay
+        mov AX, dayOfBirth
+        sub AX, currentDay
+        MOV deltaDay, AX
 
         RET
 dayDifference ENDP
@@ -139,8 +189,8 @@ dayDifference ENDP
 yearToDay PROC
         
         mov ax, 365
-        mul ax, deltaYear
-        mov output, ax
+        mul deltaYear
+        add output, ax
         
         RET
 yearToDay ENDP
@@ -148,24 +198,28 @@ yearToDay ENDP
 monthToDay PROC
         ;; If the currentMonth is gretar than monthOfBirth
         CMP isCurrentMonthGreaterThanBirthMonth, 1
-        JZ currentMonthGreaterThanBirthMonth
+        JZ currentMonthGreaterThanBirthMonth 
+        
+        MOV AH, 00
+        MOV BH, 00
+        MOV BX, monthOfBirth
+        mov AX, daysPerMonth[BX]   
+        MOV BX, currentMonth
+        sub AX, daysPerMonth[BX]
 
-        mov temporal, daysPerMonth[monthOfBirth]
-        sub temporal, daysPerMonth[currentMonth]
-
-        add output, temporal
-        mov temporal, 0
+        add output, AX
         
         RET
         
         
-isCurrentMonthGreaterThanBirthMonth:
+CurrentMonthGreaterThanBirthMonth:
         
-        mov temporal, daysPerMonth[currentMonth]
-        sub temporal, daysPerMonth[monthOfBirth]
+        MOV BX, currentMonth
+        mov AX, daysPerMonth[BX]   
+        MOV BX, monthOfBirth
+        sub AX, daysPerMonth[BX]
 
-        add output, temporal
-        mov temporal, 0
+        add output, AX
         
         RET
 monthToDay ENDP
@@ -175,14 +229,36 @@ monthToDay ENDP
                                 ;ADDS LEAPDAYS
 addLeapYears PROC
 
-        MOV AX, 00
-        MOV AL, deltaYear
-        DIV AL, 4
-
-        ADD output, AH
+        MOV AH, 00
+        MOV AL, deltaYear   
+        MOV BL, 4
+        DIV BL
+        
+        MOV AH, 00 
+        ADD output, AX
 
         RET
 
 addLeapYears ENDP 
-        
+                 
+                 
+                 
+OUTPUTTOSTRING         PROC
+        MOV DX, 0000H
+        MOV SI, 3
+        MOV AX, output
+        MOV BX, 10
+        MOV CX, 4
+
+LOOPS:
+        DIV BX
+        ADD DX, 30H             ;CONVERT TO ASCII
+        MOV outputString[SI], DL
+        DEC SI
+        MOV DX, 0
+        LOOP LOOPS
+
+        RET
+OUTPUTTOSTRING         ENDP                 
+                 
         END main
