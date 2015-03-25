@@ -179,12 +179,13 @@ YEARLOOP:
         div bx                  ;Get the last digit of the year
         add dx, 30H             ;Add 48 to remainder to get
                                 ; ascii representation
+        
         mov yearString[si], dl  ;Insert character to string.
         dec si                  ;Else: - increment si
         mov dx, 0               ;      - reset dx
         LOOP YEARLOOP           ;Loop. 
 
-        
+        RET
 
 setUpYear ENDP
 
