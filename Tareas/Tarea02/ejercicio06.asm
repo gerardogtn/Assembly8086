@@ -85,7 +85,7 @@ valida:
         MOV AH, 00
         INT 16H
 
-        CMP AL, 'A'
+        CMP AL, 'a'
         JNZ esEnter
         call changeColourCounter
         call imprimirFecha
@@ -100,7 +100,6 @@ manageKeyboard ENDP
 
 
 imprimirFecha PROC
-
         call getFecha
         call setUpFechaString
         printStrings dateString, 4, 2, colourCounter
@@ -170,20 +169,22 @@ setUpMonth ENDP
 
 
 setUpyear PROC
-        MOV SI, 9
-        MOV BX, 10
-        MOV AH, 00
-        MOV AX, currentYear
-        
-SUY:
-        DIV BX
-        ADD DL, 30H
-        MOV dateString[SI], DL
-        DEC SI
-        CMP AX, 0
-        JNZ SUY
+        mov dx, 0
+        mov si, 9
+        mov ax, currentYear
+        mov bx, 10    
+        mov cx, 4
 
-        RET
+YEARLOOP:       
+        div bx                  ;Get the last digit of the year
+        add dx, 30H             ;Add 48 to remainder to get
+                                ; ascii representation
+        mov yearString[si], dl  ;Insert character to string.
+        dec si                  ;Else: - increment si
+        mov dx, 0               ;      - reset dx
+        LOOP YEARLOOP           ;Loop. 
+
+        
 
 setUpYear ENDP
 
