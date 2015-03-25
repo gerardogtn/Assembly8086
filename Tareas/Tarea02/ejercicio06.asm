@@ -26,7 +26,7 @@ printStrings MACRO MSG, ROW, COL, colour
 printLoop:
         MOV AL, MSG[SI]
 
-        CMP AL, 'a'
+        CMP AL, 'A'
         JZ printExit
         
         MOV AH, 0EH
