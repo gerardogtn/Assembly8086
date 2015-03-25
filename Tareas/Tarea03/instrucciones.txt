@@ -1,0 +1,17 @@
+De los siguientes problemas, entregue su algoritmo, diagrama de flujo o
+pseudocodigo, asi como el programa.
+
+Elabore un programa que le permita al usuario, escoger la forma en la cual
+se le informara la fecha del sistema (ddmmaa, mmddaa, ddmmaaaa, aammdd).
+
+Use como base el programa anterior, pero ahora deje que el usuario elija
+la forma en la cual le dara la hora del sistema (hh:mm:ss, mm:hh, ss:mm:hh,
+para cuando el horario esta en formato de 12 horas (am/pm) o de 24 horas.
+
+Escriba un programa que permita al usuario escoger el color de la letra y
+del fondo. Asi mismo, que introduzca un mensaje, y lo despliegue con los
+atributos antes seleccionados.
+
+
+Escriba un programa que muestre en numeros grandes la hora del sistema.
+Fecha de entrega: Un dia antes del examen parcial.
