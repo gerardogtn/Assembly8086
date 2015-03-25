@@ -45,7 +45,7 @@ printStrings ENDM
         .DATA
         colourCounter DB 0
         welcomeString DB 'Bienvenido, teclea "a" para imprimir la fecha actual'
-                      DB ' oprima enter para salir del programa', 0
+                      DB ' oprima enter para salir del programa', 'A'
 
 
         currentYear  DW 0
@@ -54,7 +54,7 @@ printStrings ENDM
 
 
         
-        dateString DB '00/00/0000', 'a'
+        dateString DB '00/00/0000', 'A'
 
         
         .CODE
@@ -85,7 +85,7 @@ valida:
         MOV AH, 00
         INT 16H
 
-        CMP AL, 'a'
+        CMP AL, 'A'
         JNZ esEnter
         call changeColourCounter
         call imprimirFecha
@@ -189,7 +189,7 @@ setUpYear ENDP
 
 changeColourCounter PROC     
         ADD colourCounter, 1
-        CMP colourCounter, FH
+        CMP colourCounter, 0FH
         JZ resetCounter
         RET
         
