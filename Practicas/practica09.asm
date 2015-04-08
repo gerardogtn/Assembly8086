@@ -10,9 +10,6 @@
 ;;; JOSE
 ;;; SALVADOR
 
-;;; FIX POSITION WHEN PRINTING.
-;;; IN FECHA NORMAL... THE ROW AND COL ARE INVERTED
-;;; IN FECHA INVERTIDA PRINTS OFFSCREEN
 ;;; WHEN RECEIVING INPUT... NEEDS TWO KEYSTROKES. 
 
 printForwards MACRO MSG, ROW, COL
@@ -73,6 +70,8 @@ printLoop:
         MOV AH, 0EH
         INT 10H                 ;IMPRIMIR CARACTER.
 
+        DEC DH
+        DEC DH
         DEC SI
         JMP printLoop
 
@@ -202,8 +201,8 @@ normalDATE:
         call storeStrings
 
         printForwards dayString,   10, 2
-        printForwards monthString, 13, 2
-        printForwards yearString,  16, 2
+        printForwards monthString, 10, 5
+        printForwards yearString,  10, 8
         
         
         RET
@@ -212,8 +211,8 @@ invertedDate:
         call storeStrings
 
         printBackwards dayString,   10, 2, 2
-        printBackwards monthString, 13, 2, 2
-        printBackwards yearString,  16, 2, 3
+        printBackwards monthString, 10, 5, 2
+        printBackwards yearString,  10, 8, 3
         
         RET
 normalTime:
@@ -221,8 +220,8 @@ normalTime:
         call storeStrings
 
         printForwards hourString,   10, 2
-        printForwards minuteString, 13, 2
-        printForwards secondString, 16, 2
+        printForwards minuteString, 10, 5
+        printForwards secondString, 10, 8
         
         RET
 invertedTime:
@@ -230,8 +229,8 @@ invertedTime:
         call storeStrings
 
         printBackwards hourString,   10, 2, 2
-        printBackwards minuteString, 13, 2, 2
-        printBackwards secondString, 16, 2, 1
+        printBackwards minuteString, 10, 5, 2
+        printBackwards secondString, 10, 8, 1
 
         RET
 createDocument:
