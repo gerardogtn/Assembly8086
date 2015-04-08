@@ -175,19 +175,19 @@ getInput ENDP
 
 
 handleInput PROC
-        CMP AL, 'F'
+        CMP input, 'F'
         JZ normalDate
 
-        CMP AL, 'I'
+        CMP input, 'I'
         JZ invertedDate
 
-        CMP AL, 'H'
+        CMP input, 'H'
         JZ normalTime
 
-        CMP AL, 'O'
+        CMP input, 'O'
         JZ invertedTime
 
-        CMP AL, 'G'
+        CMP input, 'G'
         JZ createDocument
 
         printForwards errorString, 10, 2
