@@ -89,9 +89,9 @@ ORG 100H
         ;; LENGTH 30. 
         menuString  DB 'Inserte la opcion a ejecutar: ', 0
         
-        dateString  DB 'F: Fecha normal', 0
+        sdateString DB 'F: Fecha normal', 0
         iDateString DB 'I: Fecha invertida', 0
-        hourString  DB 'H: Hora normal', 0
+        shourString DB 'H: Hora normal', 0
         iHourString DB 'O: Hora invertida', 0
         saveString  DB 'G: Guardar hora y fecha en un archivo', 0
         errorString DB 'No hay funcionalidad para la opcion seleccionada', 0
@@ -137,9 +137,9 @@ main   ENDP
 printMenu PROC
         
         printForwards menuString,  2, 2
-        printForwards dateString,  3, 2
+        printForwards sdateString, 3, 2
         printForwards iDateString, 4, 2
-        printForwards hourString,  5, 2
+        printForwards shourString, 5, 2
         printForwards iHourString, 6, 2
         printForwards saveString,  7, 2      
 
