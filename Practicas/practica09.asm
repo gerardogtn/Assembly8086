@@ -207,9 +207,9 @@ invertedDate:
         call getDateTime
         call storeStrings
 
-        printBackwards dayString,   10, 2
-        printBackwards monthString, 13, 2
-        printBackwards yearString,  16, 2
+        printBackwards dayString,   10, 2, 2
+        printBackwards monthString, 13, 2, 2
+        printBackwards yearString,  16, 2, 3
         
         RET
 normalTime:
@@ -225,9 +225,9 @@ invertedTime:
         call getDateTime
         call storeStrings
 
-        printBackwards hourString,   10, 2
-        printBackwards minuteString, 13, 2
-        printBackwards secondString, 16, 2
+        printBackwards hourString,   10, 2, 2
+        printBackwards minuteString, 13, 2, 2
+        printBackwards secondString, 16, 2, 1
 
         RET
 createDocument:
