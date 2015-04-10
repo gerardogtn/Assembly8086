@@ -99,6 +99,8 @@ ORG 100H
         saveString  DB 'G: Guardar hora y fecha en un archivo', 0
         errorString DB 'No hay funcionalidad para la opcion seleccionada', 0
 
+        fileName DB 'CurrentDateTime', 0
+        
         input DB ' ', 0
 
         currentYear   dw 0
@@ -108,12 +110,12 @@ ORG 100H
         currentMinute db 0
         currentSecond db 0
      
-        yearString   db '0000', 0
+        yearString   db '0000',  0
         monthString  db '00/',   0
         dayString    db '00/',   0
         hourString   db '00:',   0
         minuteString db '00:',   0
-        secondString db '00',   0
+        secondString db '00',    0
 
 
 ;;; ********************* CODE *************************
@@ -236,7 +238,6 @@ invertedTime:
 createDocument:
         call getDateTime
         call storeStrings
-
         call documentHandling
 
         RET
@@ -245,13 +246,84 @@ handleInput ENDP
         
 
 documentHandling PROC
-        
+        CALL createFile
+        CALL writeFile
+        CALL closeFile
         
         RET
 documentHandling ENDP
 
 
-        getDateTime PROC
+createFile PROC
+        MOV AX, 03CH
+        MOV CX, 0
+        MOV DX, fileName
+        
+createFile ENDP
+        
+closeFile PROC
+        MOV ah, 03EH
+        MOV BX, fileName
+        INT 21H
+        
+closeFile ENDP
+
+writeFile PROC
+
+        MOV AH, 40H
+        MOV BX, fileName
+        MOV DX, 'Fecha: '
+        MOV CX, 7
+        INT 21H
+
+        MOV AH, 40H
+        MOV BX, fileName
+        MOV DX, dayString
+        MOV CX, 3
+        INT 21H
+
+        MOV AH, 40H
+        MOV BX, fileName
+        MOV DX, monthString
+        MOV CX, 3
+        INT 21H
+
+        MOV AH, 40H
+        MOV BX, fileName
+        MOV DX, yearString
+        MOV CX, 4
+        INT 21H
+
+        
+        MOV AH, 40H
+        MOV BX, fileName
+        MOV DX, ' Hora: '
+        MOV CX, 7
+        INT 21H
+
+        MOV AH, 40H
+        MOV BX, fileName
+        MOV DX, hourString
+        MOV CX, 3
+        INT 21H
+
+        MOV AH, 40H
+        MOV BX, fileName
+        MOV DX, minuteString
+        MOV CX, 3
+        INT 21H
+
+        MOV AH, 40H
+        MOV BX, fileName
+        MOV DX, secondString
+        MOV CX, 3
+        INT 21H
+        
+
+writeFile ENDP
+        
+        
+getDateTime PROC
         
         ;; Get date. 
         mov ah, 2AH
