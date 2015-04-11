@@ -10,7 +10,6 @@
 ;;; JOSE
 ;;; SALVADOR
 
-;;; WHEN RECEIVING INPUT... NEEDS TWO KEYSTROKES. 
 
 printForwards MACRO MSG, ROW, COL
         LOCAL printLoop
@@ -24,6 +23,7 @@ printForwards MACRO MSG, ROW, COL
         MOV DL, COL
         MOV AH, 02H
         INT 10H 
+  
         
 
 printLoop:
@@ -53,7 +53,8 @@ printBackwards MACRO MSG, ROW, COL, LENGTH
 
         MOV AX, LENGTH
         ADD AX, COL
-        MOV DH, AX
+        MOV DH, AX    
+        INC DH
             
         MOV DL, COL
         MOV AL, 00
