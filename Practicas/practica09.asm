@@ -115,7 +115,10 @@ ORG 100H
         dayString    db '00/',   0
         hourString   db '00:',   0
         minuteString db '00:',   0
-        secondString db '00',    0
+        secondString db '00',    0   
+        
+        fecha  DB 'Fecha: ', 0
+        tiempo DB ' Hora: ', 0
 
 
 ;;; ********************* CODE *************************
@@ -147,7 +150,7 @@ printMenu PROC
         printForwards shourString, 5, 2
         printForwards iHourString, 6, 2
         printForwards saveString,  7, 2      
-
+        RET
 printMenu ENDP
 
 
@@ -168,7 +171,12 @@ teclaValida:
 
         MOV AH, 00
         INT 16H
-
+        
+        MOV DH, 02
+        mov DL, 32
+        MOV AH, 02H
+        INT 10H
+        
         MOV AH, 0EH
         INT 10H
         
@@ -272,7 +280,7 @@ writeFile PROC
 
         MOV AH, 40H
         MOV BX, fileName
-        MOV DX, 'Fecha: '
+        MOV DX, fecha
         MOV CX, 7
         INT 21H
 
@@ -297,7 +305,7 @@ writeFile PROC
         
         MOV AH, 40H
         MOV BX, fileName
-        MOV DX, ' Hora: '
+        MOV DX, tiempo
         MOV CX, 7
         INT 21H
 
