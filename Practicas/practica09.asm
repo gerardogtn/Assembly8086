@@ -392,7 +392,6 @@ YEARLOOP:
         div bx                  ;Get the last digit of the year
         add dx, 48              ;Add 48 to remainder to get
                                 ; ascii representation
-
         
         mov yearString[si], dl  ;Insert character to string.
         dec si                  ;Else: - increment si
@@ -505,9 +504,5 @@ storeStrings PROC
         RET
 storeStrings ENDP
 
-
-
-
-        
-        
+   
         END main
