@@ -46,34 +46,22 @@ printForwards ENDM
 printBackwards MACRO MSG, ROW, COL, LENGTH 
         LOCAL printLoop
         LOCAL printExit
-        MOV SI, LENGTH              ;INDICE DE CADENA EN 0
+        MOV SI, LENGTH          ;INDICE DE CADENA EN 0
 
         MOV BH, 00
         MOV BL, 0F0H            ;FONDO BLANCO, LETRA NEGRA.
 
-        MOV AX, LENGTH
-        ADD AX, COL
-        MOV DI, AX    
-        INC DI
-
-            
+        MOV DH, ROW             ;MOVER CURSOR. 
         MOV DL, COL
-        MOV AL, 00
         MOV AH, 02H
         INT 10H 
+  
         
 
 printLoop:
-
-        MOV DL, COL
-        MOV DH, DI
-        INT 02H
-
-        DEC DI
-        
         MOV AL, MSG[SI]
 
-        CMP SI, 0
+        CMP  SI, 0
         JNGE printExit
         
         MOV AH, 0EH
@@ -151,11 +139,11 @@ main   ENDP
 
 printMenu PROC        
         printForwards menuString,  2, 2
-        printForwards sdateString, 3, 2
-        printForwards iDateString, 4, 2
-        printForwards shourString, 5, 2
-        printForwards iHourString, 6, 2
-        printForwards saveString,  7, 2      
+        ;;printForwards sdateString, 3, 2
+        ;;printForwards iDateString, 4, 2
+        ;;printForwards shourString, 5, 2
+        ;;printForwards iHourString, 6, 2
+        ;;printForwards saveString,  7, 2      
         RET
 printMenu ENDP
 
@@ -225,10 +213,11 @@ normalDATE:
 invertedDate:
         call getDate
         call storeStrings
-
-        printBackwards dayString,   10, 2, 2
-        printBackwards monthString, 10, 5, 2
-        printBackwards yearString,  10, 8, 3
+        
+        printBackwards yearString,  10, 2, 3
+        printBackwards monthString, 10, 6, 2        
+        printBackwards dayString,   10, 9, 2
+        
         
         RET
 normalTime:
@@ -243,10 +232,10 @@ normalTime:
 invertedTime:
         call getTime
         call storeStrings
-
-        printBackwards hourString,   10, 2, 2
-        printBackwards minuteString, 10, 5, 2
-        printBackwards secondString, 10, 8, 1
+           
+        printBackwards secondString, 10, 2, 1
+        printBackwards minuteString, 10, 4, 2   
+        printBackwards hourString,   10, 7, 2
 
         RET
 createDocument:
