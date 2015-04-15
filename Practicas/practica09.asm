@@ -93,8 +93,10 @@ ORG 100H
         iHourString DB 'O: Hora invertida', 0
         saveString  DB 'G: Guardar hora y fecha en un archivo', 0
         errorString DB 'No hay funcionalidad para la opcion seleccionada', 0
-
-        fileName DB 'CurrentDateTime', 0
+        savingError DB 'Error al guardar', 0     
+             
+        fileName DB 'C:\emu8086\vdrive\CurrentDateTime.txt', 0
+        handle   DW ?
         
         input DB ' ', 0
 
@@ -258,73 +260,83 @@ documentHandling ENDP
 
 
 createFile PROC
-        MOV AX, 03CH
+        MOV AH, 03CH
         MOV CX, 0
-        MOV DX, fileName
+        MOV DX, offset fileName
 
-        INT 21H
+        INT 21H         
         
+        JNC exitFile
+        
+        printForwards savingError, 10, 2 
+        
+exitFile:        
+
+        MOV handle, AX
+
+        RET        
 createFile ENDP
         
 closeFile PROC
         MOV ah, 03EH
         MOV BX, fileName
         INT 21H
-        
+          
+        RET  
 closeFile ENDP
 
 writeFile PROC
 
         MOV AH, 40H
-        MOV BX, fileName
-        MOV DX, fecha
+        MOV BX, handle
+        MOV DX, offset fecha
         MOV CX, 7
         INT 21H
 
         MOV AH, 40H
-        MOV BX, fileName
-        MOV DX, dayString
+        MOV BX, handle
+        MOV DX, offset dayString
         MOV CX, 3
         INT 21H
 
         MOV AH, 40H
-        MOV BX, fileName
-        MOV DX, monthString
+        MOV BX, handle
+        MOV DX, offset monthString
         MOV CX, 3
         INT 21H
 
         MOV AH, 40H
-        MOV BX, fileName
-        MOV DX, yearString
+        MOV BX, handle
+        MOV DX, offset yearString
         MOV CX, 4
         INT 21H
 
         
         MOV AH, 40H
-        MOV BX, fileName
-        MOV DX, tiempo
+        MOV BX, handle
+        MOV DX, offset tiempo
         MOV CX, 7
         INT 21H
 
         MOV AH, 40H
-        MOV BX, fileName
-        MOV DX, hourString
+        MOV BX, handle
+        MOV DX, offset hourString
         MOV CX, 3
         INT 21H
 
         MOV AH, 40H
-        MOV BX, fileName
-        MOV DX, minuteString
+        MOV BX, handle
+        MOV DX, offset minuteString
         MOV CX, 3
         INT 21H
 
         MOV AH, 40H
-        MOV BX, fileName
-        MOV DX, secondString
+        MOV BX, handle
+        MOV DX, offset secondString
         MOV CX, 3
         INT 21H
         
-
+        RET
 writeFile ENDP
         
         
