@@ -53,8 +53,9 @@ printBackwards MACRO MSG, ROW, COL, LENGTH
 
         MOV AX, LENGTH
         ADD AX, COL
-        MOV DH, AX    
-        INC DH
+        MOV DI, AX    
+        INC DI
+
             
         MOV DL, COL
         MOV AL, 00
@@ -63,6 +64,13 @@ printBackwards MACRO MSG, ROW, COL, LENGTH
         
 
 printLoop:
+
+        MOV DL, COL
+        MOV DH, DI
+        INT 02H
+
+        DEC DI
+        
         MOV AL, MSG[SI]
 
         CMP SI, 0
@@ -71,8 +79,6 @@ printLoop:
         MOV AH, 0EH
         INT 10H                 ;IMPRIMIR CARACTER.
 
-        DEC DH
-        DEC DH
         DEC SI
         JMP printLoop
 
@@ -267,6 +273,8 @@ createFile PROC
         MOV AX, 03CH
         MOV CX, 0
         MOV DX, fileName
+
+        INT 21H
         
 createFile ENDP
         
