@@ -149,8 +149,7 @@ main   PROC
 main   ENDP
 
 
-printMenu PROC
-        
+printMenu PROC        
         printForwards menuString,  2, 2
         printForwards sdateString, 3, 2
         printForwards iDateString, 4, 2
@@ -214,7 +213,7 @@ handleInput PROC
         RET
         
 normalDATE:
-        call getDateTime
+        call getDate
         call storeStrings
 
         printForwards dayString,   10, 2
@@ -224,7 +223,7 @@ normalDATE:
         
         RET
 invertedDate:
-        call getDateTime
+        call getDate
         call storeStrings
 
         printBackwards dayString,   10, 2, 2
@@ -233,7 +232,7 @@ invertedDate:
         
         RET
 normalTime:
-        call getDateTime
+        call getTime
         call storeStrings
 
         printForwards hourString,   10, 2
@@ -242,7 +241,7 @@ normalTime:
         
         RET
 invertedTime:
-        call getDateTime
+        call getTime
         call storeStrings
 
         printBackwards hourString,   10, 2, 2
@@ -341,7 +340,12 @@ writeFile ENDP
         
         
 getDateTime PROC
-        
+        CALL getDate
+        CALL getTime            
+        RET
+getDateTime ENDP
+
+getDate PROC
         ;; Get date. 
         mov ah, 2AH
         int 21H
@@ -351,6 +355,10 @@ getDateTime PROC
         mov currentMonth, dh
         mov currentDay,   dl
 
+        RET
+getDate ENDP
+        
+getTime PROC        
         ;; Get time.
         mov ah, 2CH
         int 21H
@@ -359,16 +367,20 @@ getDateTime PROC
         mov currentHour,   ch
         mov currentMinute, cl
         mov currentSecond, dh
-                     
-                     
+
         RET
+getTime ENDP
+        
 
-getDateTime ENDP
+storeDateStrings PROC
+        CALL storeYearString
+        CALL storeMonthString
+        CALL storeDayString
+        RET
+storeDateStrings ENDP
 
 
-
-storeStrings PROC
-
+storeYearString PROC
         ;; Store year.
         mov dx, 0
         mov si, 3
@@ -386,9 +398,11 @@ YEARLOOP:
         dec si                  ;Else: - increment si
         mov dx, 0               ;      - reset dx
         LOOP YEARLOOP           ;Loop. 
-                
-                
-                
+
+        RET
+storeYearString ENDP 
+
+storeMonthString PROC
         mov dx, 0000
         mov si, 1 
         mov ah, 00
@@ -402,9 +416,11 @@ MONTHLOOP:
         dec si
         mov dx, 0000
         LOOP MONTHLOOP
-
-
         
+        RET
+storeMonthString ENDP
+
+storeDayString PROC
         mov dx, 0000
         mov si, 1
         mov ah, 00
@@ -418,7 +434,17 @@ DAYLOOP:
         mov dx, 0000
         LOOP DAYLOOP
 
+        RET
+storeDayString ENDP
 
+storeTimeStrings PROC
+        CALL storeHourString
+        CALL storeMinuteString
+        CALL storeSecondString
+        RET
+storeTimeStrings ENDP        
+
+storeHourString PROC
         
         mov dx, 0000
         mov si, 1
@@ -433,8 +459,11 @@ HOURLOOP:
         mov dx, 0000
         LOOP HOURLOOP
         
-
+        RET
+storeHourString ENDP
         
+storeMinuteString PROC
+
         mov dx, 0000
         mov si, 1
         mov ah, 00
@@ -447,9 +476,12 @@ MINUTELOOP:
         dec si
         mov dx, 0000
         LOOP MINUTELOOP
-
-
         
+        RET
+storeMinuteString ENDP
+        
+storeSecondString PROC
+
         mov dx, 0000
         mov si, 1
         mov ah, 00
@@ -461,10 +493,16 @@ SECONDLOOP:
         mov secondString[si], dl
         dec si
         mov dx, 0000
-        LOOP SECONDLOOP  
+        LOOP SECONDLOOP
         
         RET
-
+storeSecondString ENDP
+        
+storeStrings PROC
+        CALL storeDateStrings
+        CALL storeTimeStrings 
+   
+        RET
 storeStrings ENDP
 
 
