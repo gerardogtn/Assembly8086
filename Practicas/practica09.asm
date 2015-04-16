@@ -54,9 +54,7 @@ printBackwards MACRO MSG, ROW, COL, LENGTH
         MOV DH, ROW             ;MOVER CURSOR. 
         MOV DL, COL
         MOV AH, 02H
-        INT 10H 
-  
-        
+        INT 10H       
 
 printLoop:
         MOV AL, MSG[SI]
@@ -75,8 +73,13 @@ printExit:
 printBackwards ENDM        
 
 
-
-
+writeToFile MACRO fileHandle, toWrite, count
+        MOV AH, 40H
+        MOV BX, fileHandle
+        MOV DX, offset toWrite
+        MOV CX, count
+        INT 21H
+writeToFile ENDM 
         
 
 ORG 100H
@@ -141,11 +144,11 @@ main   ENDP
 
 printMenu PROC        
         printForwards menuString,  2, 2
-        ;;printForwards sdateString, 3, 2
-        ;;printForwards iDateString, 4, 2
-        ;;printForwards shourString, 5, 2
-        ;;printForwards iHourString, 6, 2
-        ;;printForwards saveString,  7, 2      
+        printForwards sdateString, 3, 2
+        printForwards iDateString, 4, 2
+        printForwards shourString, 5, 2
+        printForwards iHourString, 6, 2
+        printForwards saveString,  7, 2      
         RET
 printMenu ENDP
 
@@ -263,15 +266,12 @@ createFile PROC
         MOV AH, 03CH
         MOV CX, 0
         MOV DX, offset fileName
-
         INT 21H         
         
-        JNC exitFile
-        
+        JNC exitFile       
         printForwards savingError, 10, 2 
         
 exitFile:        
-
         MOV handle, AX
 
         RET        
@@ -279,7 +279,7 @@ createFile ENDP
         
 closeFile PROC
         MOV ah, 03EH
-        MOV BX, fileName
+        MOV BX, handle 
         INT 21H
           
         RET  
@@ -287,54 +287,14 @@ closeFile ENDP
 
 writeFile PROC
 
-        MOV AH, 40H
-        MOV BX, handle
-        MOV DX, offset fecha
-        MOV CX, 7
-        INT 21H
-
-        MOV AH, 40H
-        MOV BX, handle
-        MOV DX, offset dayString
-        MOV CX, 3
-        INT 21H
-
-        MOV AH, 40H
-        MOV BX, handle
-        MOV DX, offset monthString
-        MOV CX, 3
-        INT 21H
-
-        MOV AH, 40H
-        MOV BX, handle
-        MOV DX, offset yearString
-        MOV CX, 4
-        INT 21H
-
-        
-        MOV AH, 40H
-        MOV BX, handle
-        MOV DX, offset tiempo
-        MOV CX, 7
-        INT 21H
-
-        MOV AH, 40H
-        MOV BX, handle
-        MOV DX, offset hourString
-        MOV CX, 3
-        INT 21H
-
-        MOV AH, 40H
-        MOV BX, handle
-        MOV DX, offset minuteString
-        MOV CX, 3
-        INT 21H
-
-        MOV AH, 40H
-        MOV BX, handle
-        MOV DX, offset secondString
-        MOV CX, 3
-        INT 21H
+        writeToFile handle, fecha,        7
+        writeToFile handle, dayString,    3
+        writeToFile handle, monthString,  3
+        writeToFile handle, yearString,   4
+        writeToFile handle, tiempo,       7
+        writeToFile handle, hourString,   3
+        writeToFile handle, minuteString, 3
+        writeToFile handle, secondString, 3
         
         RET
 writeFile ENDP
