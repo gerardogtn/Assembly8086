@@ -87,7 +87,6 @@ main PROC
         CALL makeOperation
         CALL outputToString
         CALL displayOutput
-
         RET
 main ENDP
 
@@ -109,7 +108,9 @@ startVideoMode ENDP
 ;;; REQUIRES:
 ;;; MODIFIES:
 ;;;  EFFECTS:
-;;; Prints all relevant instructions to the execution of the program. 
+;;; Prints all relevant instructions to the execution of the program.
+        
+;;; TODO: PROCEDURE.
 printInstructions PROC
         ;; STUB
         RET
@@ -121,6 +122,8 @@ printInstructions ENDP
 ;;; MODIFIES: numAstring. 
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the first string number
+                
+;;; TODO: PROCEDURE. CREATE MACRO
 getInputA PROC
         ;; STUB
         RET
@@ -132,7 +135,7 @@ getInputA ENDP
 ;;; MODIFIES: operatorString. 
 ;;; EFFECTS: Gets from the keyboard the operator input.
 ;;;          The operator must be one of: + / * - %
-;;; Gets the operator string. 
+;;; Gets the operator string. USE MACRO FROM GETINPUTA.
 getOperator PROC
         ;; STUB
         RET
@@ -143,7 +146,9 @@ getOperator ENDP
 ;;; REQUIRES: GLOBAL VARIABLE NUMBSTRING EXISTS AND IS THREE CHARACTERS LONG.
 ;;; MODIFIES: numBString. 
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
-;;; Gets the second string number        
+;;; Gets the second string number
+                
+;;; TODO: PROCEDURE. USEMACRO FROM GETINPUTA. 
 getInputB PROC
         ;; STUB
         RET
@@ -155,7 +160,9 @@ getInputB ENDP
 ;;; ASSUMES : numAString and NumBString only contain numerical characters. 
 ;;; MODIFIES: numA. NumB.
 ;;; EFFECTS : Transform a string of digits to its numerical representation. 
-;;; Transform the number strings to numbers. 
+;;; Transform the number strings to numbers.
+                
+;;; TODO: PROCEDURE. CREATE A MACRO. 
 inputStringToNum PROC
         ;; STUB
         RET
@@ -167,7 +174,9 @@ inputStringToNum ENDP
 ;;; MODIFIES: output
 ;;; EFFECTS : Gets the result of doing operator on the arguments numA and numB
 ;;; Numerical output is obtained
-;;; WARNING: OVERFLOW MAY OCCUR. 
+;;; WARNING: OVERFLOW MAY OCCUR.
+                
+;;; TODO: PROCEDURE. USE HANDLEINPUT FROM PRACTICA9
 makeOperation PROC
         ;; STUB
         RET
@@ -179,7 +188,9 @@ makeOperation ENDP
 ;;; REQUIRES: Output is a valid number. 
 ;;; MODIFIES: OutputString. 
 ;;;  EFFECTS: Gets the output string from output. 
-;;; 
+;;;
+                
+;;; TODO: PROCEDURE. CREATE A MACRO. 
 outputToString PROC
         ;; STUB
         RET
@@ -191,6 +202,8 @@ outputToString ENDP
 ;;; MODIFIES:
 ;;; EFFECTS:  Prints to screen the output string. 
 ;;; Displays in screen
+                
+;;; TODO: PROCEDURE. USE PRINTFORWARDS MACRO. 
 displayOutput PROC
         ;; STUB
         RET
