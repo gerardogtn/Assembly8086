@@ -1,7 +1,9 @@
 # Word files
 *.docx
 
+# Other files NOT to be included. 
 /Practicas/images
+/Proyecto/*.pdf
 
 # OS generated files 
 .DS_Store
