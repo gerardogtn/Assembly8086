@@ -50,9 +50,33 @@ printExit:
 
 printForwards ENDM
 
+getStringFromKeyBoard MACRO variableToStore, numOfChar
+        LOCAL validKeyStroke
+        LOCAL getFromKBLoop
+        
+        MOV CX, numOfChar
+        MOV SI, 00
+        
+getFromKBLoop:  
+        ;; CLEAR BUFFER
+        MOV AH, 01
+        
+validKeyStroke: 
+        INT 16 H
+        JZ validKeyStroke
 
+        ;; GET CHARACTER FROM KEYBOARD
+        MOV AH, 00
+        INT 16H
 
+        ;; STORE CHARACTER IN STRING
+        MOV variableToStore[SI], AL
+        INC SI
 
+        LOOP getFromKBLoop
+
+getStringFromKeyboard ENDM
+        
 
 
         ORG 100H
@@ -112,7 +136,7 @@ startVideoMode ENDP
         
 ;;; TODO: PROCEDURE.
 printInstructions PROC
-        ;; STUB
+        printForwards instructionA, 2, 2
         RET
 printInstructions ENDP
 
@@ -122,10 +146,8 @@ printInstructions ENDP
 ;;; MODIFIES: numAstring. 
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the first string number
-                
-;;; TODO: PROCEDURE. CREATE MACRO
 getInputA PROC
-        ;; STUB
+        getStringFromKeyBoard numAString, 3 
         RET
 
 getInputA ENDP 
@@ -135,9 +157,9 @@ getInputA ENDP
 ;;; MODIFIES: operatorString. 
 ;;; EFFECTS: Gets from the keyboard the operator input.
 ;;;          The operator must be one of: + / * - %
-;;; Gets the operator string. USE MACRO FROM GETINPUTA.
+;;; TODO: ENFORCE THAT OPERATOR IS A VALID ONE. 
 getOperator PROC
-        ;; STUB
+        getStringFromKeyBoard operatorString, 1
         RET
 
 getOperator ENDP
@@ -147,10 +169,8 @@ getOperator ENDP
 ;;; MODIFIES: numBString. 
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the second string number
-                
-;;; TODO: PROCEDURE. USEMACRO FROM GETINPUTA. 
 getInputB PROC
-        ;; STUB
+        getStringFromKeyBoard numBString, 3 
         RET
 getInputB ENDP
 
