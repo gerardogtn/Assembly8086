@@ -76,8 +76,33 @@ validKeyStroke:
         LOOP getFromKBLoop
 
 getStringFromKeyboard ENDM
-        
 
+
+;;; STRINGTONUM:
+;;; STRING NATURAL INT  ->
+;;; GETS A STRING MADE OF DIGITS AND THE SIZE OF THE STRING.
+;;; REQUIRES: THE STRING IS MADE OF DIGITS. SIZE IS SIZE OF THE STRING.
+;;; MODIFIES: numberVar. SI. AH. CX. BL
+;;; EFFECTS:  TRANSFORMS THE NUMBER STRING TO A NUMBER. 
+stringToNum MACRO numberString, size, numberVar
+        LOCAL STNL
+
+        MOV SI, 00
+        MOV AH, 10
+        MOV CX, size
+        MOV numberVar, 0
+
+STNL:
+        MUL numberVar, AH
+        MOV BL, numberString[SI]
+        SUB BL, 30H
+        ADD numberVar, BL
+        INC SI
+        LOOP STNL
+
+stringToNum ENDM
+        
+        
 
         ORG 100H
 
@@ -181,10 +206,9 @@ getInputB ENDP
 ;;; MODIFIES: numA. NumB.
 ;;; EFFECTS : Transform a string of digits to its numerical representation. 
 ;;; Transform the number strings to numbers.
-                
-;;; TODO: PROCEDURE. CREATE A MACRO. 
 inputStringToNum PROC
-        ;; STUB
+        stringToNum numAString, 3, numA
+        stringToNum numBString, 3, numB
         RET
 inputStringToNum ENDP
         
