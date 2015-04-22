@@ -246,10 +246,8 @@ outputToString ENDP
 ;;; MODIFIES:
 ;;; EFFECTS:  Prints to screen the output string. 
 ;;; Displays in screen
-                
-;;; TODO: PROCEDURE. USE PRINTFORWARDS MACRO. 
 displayOutput PROC
-        ;; STUB
+        printForwards outputString, 13, 2
         RET
 displayOutput ENDP
         
