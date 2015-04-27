@@ -102,8 +102,67 @@ STNL:
 
 stringToNum ENDM
         
+;;; INT INT ->
+;;; REQUIRES:
+;;; MODIFIES: 
+printSum MACRO intA, intB
         
+        MOV AX, intA
+        ADD AX, intB
+        printNum AX, 10, 2
+        
+printSum ENDM 
 
+
+printModulo MACRO  intA, intB
+        MOV AX, intA
+        DIV intB
+        printNum BX, 10, 2
+
+printModulo ENDM       
+
+
+printMultiplication MACRO  intA, intB
+        MOV AX, intA
+        MUL intB
+        printNum AX, 10, 2
+        
+printMultiplication ENDM
+
+
+printDivision MACRO  intA, intB
+        MOV AX, intA
+        DIV intB
+        printNum AX, 10, 2
+        prinForwards "    0" 10, 6
+        printNum DX, 10, 10
+        printForwards "/0", 10, 15
+        printNum intA, 10, 16
+        
+printDivision ENDM
+
+
+printSubstraction MACRO  intA, intB
+        LOCAL negative
+        LOCAL exit
+        
+        MOV AX, intA
+        SUB AX, intB
+        CMP AX, 0
+        JNGE negative
+
+        printNum AX, 10, 2
+        JMP exit
+
+negative:
+        printForwards "-0", 10, 2
+        printNum AX, 10, 2
+
+exit:   
+        
+printSubstraction ENDM
+        
+        
         ORG 100H
 
 
@@ -133,9 +192,7 @@ main PROC
         CALL getOperator
         CALL getInputB
         CALL inputStringToNum
-        CALL makeOperation
-        CALL outputToString
-        CALL displayOutput
+        CALL printOperation
         RET
 main ENDP
 
@@ -221,7 +278,7 @@ inputStringToNum ENDP
 ;;; WARNING: OVERFLOW MAY OCCUR.
                 
 ;;; TODO: PROCEDURE. USE HANDLEINPUT FROM PRACTICA9
-makeOperation PROC
+printOperation PROC
         operatorASCII DB, operatorString[0]
 
         LOCAL A
@@ -232,36 +289,36 @@ makeOperation PROC
         
         CMP operatorASCII, 53
         JNZ A
-        makeSum numA, numB
+        printSum numA, numB
         RET
 
 A:      
         CMP operatorASCII, 45
         JNZ B
-        makeModulo numA, numB
+        printModulo numA, numB
         RET
 
 B:      
         CMP operatorASCII, 57
         JNZ C
-        makeDivision numA, numB
+        printDivision numA, numB
         RET
 
 C:      
         CMP operatorASCII, 52
         JNZ D
-        makeMultiplication numA, numB
+        printMultiplication numA, numB
         RET
 
 D:      
         CMP operatorASCII, 55
         JNZ E
-        makeSubstraction numA, numB
+        printSubstraction numA, numB
 
 E:      
         RET
 
-makeOperation ENDP
+printOperation ENDP
         
 
 ;;; OUTPUTTOSTRING
