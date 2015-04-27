@@ -182,7 +182,7 @@ getInputA ENDP
 ;;; MODIFIES: operatorString. 
 ;;; EFFECTS: Gets from the keyboard the operator input.
 ;;;          The operator must be one of: + / * - %
-;;; TODO: ENFORCE THAT OPERATOR IS A VALID ONE. 
+;;; TODO: ENFORCE THAT OPERATOR IS A VALID ONE. SOLVED WITH MOUSE INPUT.
 getOperator PROC
         getStringFromKeyBoard operatorString, 1
         RET
@@ -222,7 +222,43 @@ inputStringToNum ENDP
                 
 ;;; TODO: PROCEDURE. USE HANDLEINPUT FROM PRACTICA9
 makeOperation PROC
-        ;; STUB
+        operatorASCII DB, operatorString[0]
+
+        LOCAL A
+        LOCAL B
+        LOCAL C
+        LOCAL D
+        LOCAL E
+        
+        CMP operatorASCII, 53
+        JNZ A
+        makeSum numA, numB
+        RET
+
+A:      
+        CMP operatorASCII, 45
+        JNZ B
+        makeModulo numA, numB
+        RET
+
+B:      
+        CMP operatorASCII, 57
+        JNZ C
+        makeDivision numA, numB
+        RET
+
+C:      
+        CMP operatorASCII, 52
+        JNZ D
+        makeMultiplication numA, numB
+        RET
+
+D:      
+        CMP operatorASCII, 55
+        JNZ E
+        makeSubstraction numA, numB
+
+E:      
         RET
 
 makeOperation ENDP
