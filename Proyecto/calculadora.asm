@@ -165,6 +165,72 @@ exit:
         
 printSubstraction ENDM
         
+
+printNum MACRO intA, ROW, COL
+        LOCAL A
+        LOCAL B
+        LOCAL C
+        LOCAL D
+        LOCAL E
+        LOCAL printLoop
+        LOCAL printExit
+        MOV SI, 10
+
+        MOV BH, 00
+        MOV BL, 0F0H
+
+
+        CMP intA, 10
+        JGE A
+        MOV DI, 1
+        JMP 
+
+A:      
+        CMP intA, 100
+        JGE B
+        MOV DI, 2
+        JMP E
+
+B:
+        CMP intA, 1000
+        JGE C
+        MOV DI, 3
+        JMP E
+
+C:      
+        CMP intA, 10000
+        JGE D
+        MOV DI, 4
+        JMP E
+
+D:
+        MOV DI, 5
+
+E:      
+
+        MOV AX, intA
+        ADD DI, ROW
+        
+printLoop:
+        CMP DI, 0
+        JZ printExit
+        
+        MOV DH, DI
+        MOV DL, COL
+        MOV AH, 02H
+        INT 10H
+
+        DEC DI     
+        DIV SI
+        MOV AL, DL
+
+        MOV AH, 0EH
+        INT 10H
+
+printExit:      
+
+printNum ENDM 
+
         
         ORG 100H
 
