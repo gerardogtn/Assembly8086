@@ -103,8 +103,7 @@ STNL:
 stringToNum ENDM
         
 ;;; INT INT ->
-;;; REQUIRES:
-;;; MODIFIES: 
+;;; MODIFIES: AX. 
 printSum MACRO intA, intB
         
         MOV AX, intA
@@ -113,7 +112,8 @@ printSum MACRO intA, intB
         
 printSum ENDM 
 
-
+;;; INT INT ->
+;;; MODIFIES: AX. BX. 
 printModulo MACRO  intA, intB
         MOV AX, intA
         DIV intB
@@ -121,7 +121,8 @@ printModulo MACRO  intA, intB
 
 printModulo ENDM       
 
-
+;;; INT INT ->
+;;; MODIFIES: AX. BX. DX.
 printMultiplication MACRO  intA, intB
         MOV AX, intA
         MUL intB
@@ -129,7 +130,8 @@ printMultiplication MACRO  intA, intB
         
 printMultiplication ENDM
 
-
+;;; INT INT ->
+;;; MODIFIES: AX. BX. DX
 printDivision MACRO  intA, intB
         MOV AX, intA
         DIV intB
@@ -141,7 +143,8 @@ printDivision MACRO  intA, intB
         
 printDivision ENDM
 
-
+;;; INT INT ->
+;;; MODIFIES: AX.
 printSubstraction MACRO  intA, intB
         LOCAL negative
         LOCAL exit
