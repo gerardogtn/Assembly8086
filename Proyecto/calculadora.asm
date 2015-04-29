@@ -62,7 +62,7 @@ getFromKBLoop:
         MOV AH, 01
         
 validKeyStroke: 
-        INT 16 H
+        INT 16H
         JZ validKeyStroke
 
         ;; GET CHARACTER FROM KEYBOARD
@@ -87,16 +87,18 @@ getStringFromKeyboard ENDM
 stringToNum MACRO numberString, size, numberVar
         LOCAL STNL
 
-        MOV SI, 00
-        MOV AH, 10
+        MOV SI, 00 
+        MOV AH, 00
+        MOV AL, 10
         MOV CX, size
         MOV numberVar, 0
 
-STNL:
-        MUL numberVar, AH
+STNL:              
+        MUL numberVar  
         MOV BL, numberString[SI]
-        SUB BL, 30H
-        ADD numberVar, BL
+        SUB BL, 30H   
+        MOV BH, 0
+        ADD numberVar, BX
         INC SI
         LOOP STNL
 
@@ -136,7 +138,7 @@ printDivision MACRO  intA, intB
         MOV AX, intA
         DIV intB
         printNum AX, 10, 2
-        prinForwards "    0" 10, 6
+        ;printForwards "    0", 10, 6
         printNum DX, 10, 10
         printForwards "/0", 10, 15
         printNum intA, 10, 16
@@ -237,7 +239,7 @@ printNum ENDM
 
 ;;; ********************** DATA ****************************
 .DATA
-        instructionA DB 'Inserte un numero (3 digitos), un operador
+        instructionA DB 'Inserte un numero (3 digitos), un operador'
                      DB 'y otro numero (3 digitos)', 0
 
         numA DW ?
@@ -246,7 +248,8 @@ printNum ENDM
         numBString DB '000',  0
         operatorString DB '0', 0
         output DW ?
-        outputString '00000', 0
+        outputString DB '00000', 0  
+        operatorASCII DB ?
 
 
 
@@ -346,45 +349,40 @@ inputStringToNum ENDP
 ;;; Numerical output is obtained
 ;;; WARNING: OVERFLOW MAY OCCUR.
                 
-;;; TODO: PROCEDURE. USE HANDLEINPUT FROM PRACTICA9
 printOperation PROC
-        operatorASCII DB, operatorString[0]
+        MOV AH, operatorString[0]
+        MOV operatorASCII, AH
 
-        LOCAL A
-        LOCAL B
-        LOCAL C
-        LOCAL D
-        LOCAL E
         
         CMP operatorASCII, 53
-        JNZ A
+        JNZ F
         printSum numA, numB
         RET
 
-A:      
+F:      
         CMP operatorASCII, 45
-        JNZ B
+        JNZ G
         printModulo numA, numB
         RET
 
-B:      
+G:      
         CMP operatorASCII, 57
-        JNZ C
+        JNZ H
         printDivision numA, numB
         RET
 
-C:      
+H:      
         CMP operatorASCII, 52
-        JNZ D
+        JNZ I
         printMultiplication numA, numB
         RET
 
-D:      
+I:      
         CMP operatorASCII, 55
-        JNZ E
+        JNZ J
         printSubstraction numA, numB
 
-E:      
+J:      
         RET
 
 printOperation ENDP
