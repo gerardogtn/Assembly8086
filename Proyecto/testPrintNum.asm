@@ -1,30 +1,44 @@
 printNum MACRO intA, ROW, COL, numDigits
-        LOCAL printLoop
-        MOV CX, numDigits
-
+        LOCAL printLoop  
+        LOCAL printExit 
+                               
+        MOV BH, 00  
+        MOV CH, 00
+        MOV CL, numDigits
+        ADD CL, COL
         MOV SI, intA
-        MOV DI, COL
-        ADD DI, numDigits
-        MOV BX, 10
 
-printLoop:
+printLoop:   
+        MOV BL, 10
+        CMP SI, 0
+        JNG printExit
+        
         ;; DIVIDE NUMBER BY TEN.
-        MOV DX, 0
+        MOV DX, 0000
         MOV AX, SI
         DIV BX
 
         ;; STORE RESULT IN SI
         MOV SI, AX
 
-        ;; PRINT REMAINDER
-        MOV AH, 0EH
-        MOV AL, DL
-        ADD AL, 30H
+        ;; ADJUST CURSOR
+        MOV BL, DL 
         MOV DH, ROW
-        MOV DL, DI
-        INT 10H
+        MOV DL, CL  
+        MOV AH, 02H
+        INT 10H        
+                   
+        ;; PRINT DIGIT        
+        MOV AH, 0EH
+        MOV AL, BL
+        ADD AL, 30H
+        DEC CL 
+        INT 10H    
         
-        LOOP printLoop
+        JMP printLoop
+                
+printExit:                
+                
 
 printNum ENDM 
 
@@ -37,10 +51,8 @@ printNum ENDM
 ;;; ########################################################################
 .DATA
         numA DW 400
-        numB DB 25
-
-
-
+        numB DW 2500  
+        numC DW 400
 
 
 
@@ -48,19 +60,15 @@ printNum ENDM
 .CODE
 
 main PROC
-        CALL startVideoMode
-        printNum numA, 4, 2
-        printNum numB, 8, 2
-        RET
-main ENDP
-
-
-startVideoMode PROC
         MOV AH, 00H
-        MOV AL, 03H
-        INT 10H
+        MOV AL, 00H
+        INT 10H            
+        
+        printNum numA, 4, 2, 3
+        printNum numB, 8, 2, 4
+        printNum numC, 4, 2, 3
         RET
-startVideoMode ENDP 
+main ENDP 
 
 
         
