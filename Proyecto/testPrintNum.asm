@@ -44,7 +44,7 @@ printNum ENDM
 
 
 
-
+ORG 100H
 
 
 
