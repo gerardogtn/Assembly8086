@@ -50,12 +50,19 @@ printExit:
 
 printForwards ENDM
 
-getStringFromKeyBoard MACRO variableToStore, numOfChar
+getStringFromKeyBoard MACRO variableToStore, numOfChar, ROW, COL
         LOCAL validKeyStroke
         LOCAL getFromKBLoop
         
         MOV CX, numOfChar
-        MOV SI, 00
+        MOV SI, 00      
+           
+        MOV BH, 00
+        MOV BL, 0F0H            ;FONDO BLANCO, LETRA NEGRA.   
+        MOV DH, ROW             ;MOVER CURSOR. 
+        MOV DL, COL
+        MOV AH, 02H
+        INT 10H 
         
 getFromKBLoop:  
         ;; CLEAR BUFFER
@@ -67,7 +74,11 @@ validKeyStroke:
 
         ;; GET CHARACTER FROM KEYBOARD
         MOV AH, 00
-        INT 16H
+        INT 16H    
+      
+        ;; PRINT INPUT CHARACTER
+        MOV AH, 0EH
+        INT 10H
 
         ;; STORE CHARACTER IN STRING
         MOV variableToStore[SI], AL
@@ -94,7 +105,8 @@ stringToNum MACRO numberString, size, numberVar
         MOV numberVar, 0
 
 STNL:              
-        MUL numberVar  
+        MUL numberVar 
+        MOV numberVar, AX 
         MOV BL, numberString[SI]
         SUB BL, 30H   
         MOV BH, 0
@@ -215,20 +227,27 @@ printNum ENDM
         
         ORG 100H
 
-
+      
+      ;; TODO : ADDITIONS WORK FINE. 
+      ;; TODO : SUBSTRACTIONS (WHERE RESULT IS NEGATIVE) NEEDS IMPROVEMENT     
+      ;; TODO : MULTIPLICATION WORKS WELL WHERE THERE IS NO OVERFLOW 
+      ;; TODO : IN CASE OF OVERFLOW IN MULTIPLICATION, "ADD" 65536 TO RESULT 
+      ;; THROUGH STRINGS. 
+      
+      
 ;;; ********************** DATA ****************************
 .DATA
         instructionA DB 'Inserte un numero (3 digitos), un operador'
                      DB 'y otro numero (3 digitos)', 0
 
-        numA DW ?
-        numB DW ?
+        numA DW 900
+        numB DW 090
         numAString DB '000',  0
         numBString DB '000',  0
-        operatorString DB '0', 0
-        output DW ?
+        operatorString DB '*', 0
+        output DW 0
         outputString DB '00000', 0  
-        operatorASCII DB ?
+        operatorASCII DB 53o
 
 
 
@@ -238,11 +257,14 @@ printNum ENDM
 ;;; MAIN: starts program. 
 main PROC
         CALL startVideoMode
-        CALL printInstructions
-        CALL getInputA
-        CALL getOperator
-        CALL getInputB
-        CALL inputStringToNum
+        ;CALL printInstructions
+        ;CALL getInputA
+        ;CALL getOperator
+        ;CALL getInputB
+        ;CALL inputStringToNum   
+        printNum numA, 2, 2, 3
+        printForwards operatorString, 2, 6
+        printNum numB, 2, 7, 3  
         CALL printOperation
         RET
 main ENDP
@@ -280,7 +302,7 @@ printInstructions ENDP
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the first string number
 getInputA PROC
-        getStringFromKeyBoard numAString, 3 
+        getStringFromKeyBoard numAString, 3, 4, 2
         RET
 
 getInputA ENDP 
@@ -292,7 +314,7 @@ getInputA ENDP
 ;;;          The operator must be one of: + / * - %
 ;;; TODO: ENFORCE THAT OPERATOR IS A VALID ONE. SOLVED WITH MOUSE INPUT.
 getOperator PROC
-        getStringFromKeyBoard operatorString, 1
+        getStringFromKeyBoard operatorString, 1, 4, 5
         RET
 
 getOperator ENDP
@@ -303,7 +325,7 @@ getOperator ENDP
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the second string number
 getInputB PROC
-        getStringFromKeyBoard numBString, 3 
+        getStringFromKeyBoard numBString, 3, 4, 6
         RET
 getInputB ENDP
 
@@ -332,34 +354,45 @@ printOperation PROC
         MOV AH, operatorString[0]
         MOV operatorASCII, AH
 
-        
-        CMP operatorASCII, 53
+                          
+        ;; HANDLES +                  
+        CMP operatorASCII, 53O
         JNZ F
         printSum numA, numB
-        RET
+        RET        
+        
+        ;; HANDLES %
 
 F:      
-        CMP operatorASCII, 45
+        CMP operatorASCII, 45O
         JNZ G
         printModulo numA, numB
-        RET
+        RET         
+        
+        ;; HANDLES /
 
 G:      
-        CMP operatorASCII, 57
+        CMP operatorASCII, 57O
         JNZ H
         printDivision numA, numB
-        RET
-
+        RET     
+        
+        
+        ;; HANDLES *                 O
 H:      
-        CMP operatorASCII, 52
+        CMP operatorASCII, 52O
         JNZ I
         printMultiplication numA, numB
         RET
-
+              
+              
+        ;; HANDLES -      
 I:      
-        CMP operatorASCII, 55
+        CMP operatorASCII, 55O
         JNZ J
         printSubstraction numA, numB
+        
+        ;; ELSE: DOES NOTHING
 
 J:      
         RET
