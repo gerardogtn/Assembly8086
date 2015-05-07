@@ -110,7 +110,7 @@ printSum MACRO intA, intB
         
         MOV AX, intA
         ADD AX, intB
-        printNum AX, 10, 2
+        printNum AX, 10, 2, 6
         
 printSum ENDM 
 
@@ -119,7 +119,7 @@ printSum ENDM
 printModulo MACRO  intA, intB
         MOV AX, intA
         DIV intB
-        printNum BX, 10, 2
+        printNum BX, 10, 2, 4
 
 printModulo ENDM       
 
@@ -128,7 +128,7 @@ printModulo ENDM
 printMultiplication MACRO  intA, intB
         MOV AX, intA
         MUL intB
-        printNum AX, 10, 2
+        printNum AX, 10, 2, 8
         
 printMultiplication ENDM
 
@@ -137,11 +137,11 @@ printMultiplication ENDM
 printDivision MACRO  intA, intB
         MOV AX, intA
         DIV intB
-        printNum AX, 10, 2
+        printNum AX, 10, 2, 4
         ;printForwards "    0", 10, 6
-        printNum DX, 10, 10
+        printNum DX, 10, 10, 4
         printForwards "/0", 10, 15
-        printNum intA, 10, 16
+        printNum intA, 10, 16, 4
         
 printDivision ENDM
 
@@ -156,80 +156,59 @@ printSubstraction MACRO  intA, intB
         CMP AX, 0
         JNGE negative
 
-        printNum AX, 10, 2
+        printNum AX, 10, 2, 4
         JMP exit
 
 negative:
         printForwards "-0", 10, 2
-        printNum AX, 10, 2
+        printNum AX, 10, 2, 4
 
 exit:   
         
 printSubstraction ENDM
         
 
-printNum MACRO intA, ROW, COL
-        LOCAL A
-        LOCAL B
-        LOCAL C
-        LOCAL D
-        LOCAL E
-        LOCAL printLoop
-        LOCAL printExit
-        MOV SI, 10
+printNum MACRO intA, ROW, COL, numDigits
+        LOCAL printLoop  
+        LOCAL printExit 
+                               
+        MOV BH, 00  
+        MOV CH, 00
+        MOV CL, numDigits
+        ADD CL, COL
+        MOV SI, intA
 
-        MOV BH, 00
-        MOV BL, 0F0H
-
-
-        CMP intA, 10
-        JGE A
-        MOV DI, 1
-        JMP 
-
-A:      
-        CMP intA, 100
-        JGE B
-        MOV DI, 2
-        JMP E
-
-B:
-        CMP intA, 1000
-        JGE C
-        MOV DI, 3
-        JMP E
-
-C:      
-        CMP intA, 10000
-        JGE D
-        MOV DI, 4
-        JMP E
-
-D:
-        MOV DI, 5
-
-E:      
-
-        MOV AX, intA
-        ADD DI, ROW
+printLoop:   
+        MOV BL, 10
+        CMP SI, 0
+        JNG printExit
         
-printLoop:
-        CMP DI, 0
-        JZ printExit
-        
-        MOV DH, DI
-        MOV DL, COL
+        ;; DIVIDE NUMBER BY TEN.
+        MOV DX, 0000
+        MOV AX, SI
+        DIV BX
+
+        ;; STORE RESULT IN SI
+        MOV SI, AX
+
+        ;; ADJUST CURSOR
+        MOV BL, DL 
+        MOV DH, ROW
+        MOV DL, CL  
         MOV AH, 02H
-        INT 10H
-
-        DEC DI     
-        DIV SI
-        MOV AL, DL
-
+        INT 10H        
+                   
+        ;; PRINT DIGIT        
         MOV AH, 0EH
-        INT 10H
-
-printExit:      
+        MOV AL, BL
+        ADD AL, 30H
+        DEC CL 
+        INT 10H    
+        
+        JMP printLoop
+                
+printExit:                
+                
 
 printNum ENDM 
 
