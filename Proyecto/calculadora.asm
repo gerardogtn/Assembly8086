@@ -50,44 +50,6 @@ printExit:
 
 printForwards ENDM
 
-getStringFromKeyBoard MACRO variableToStore, numOfChar, ROW, COL
-        LOCAL validKeyStroke
-        LOCAL getFromKBLoop
-        
-        MOV CX, numOfChar
-        MOV SI, 00      
-           
-        MOV BH, 00
-        MOV BL, 0F0H            ;FONDO BLANCO, LETRA NEGRA.   
-        MOV DH, ROW             ;MOVER CURSOR. 
-        MOV DL, COL
-        MOV AH, 02H
-        INT 10H 
-        
-getFromKBLoop:  
-        ;; CLEAR BUFFER
-        MOV AH, 01
-        
-validKeyStroke: 
-        INT 16H
-        JZ validKeyStroke
-
-        ;; GET CHARACTER FROM KEYBOARD
-        MOV AH, 00
-        INT 16H    
-      
-        ;; PRINT INPUT CHARACTER
-        MOV AH, 0EH
-        INT 10H
-
-        ;; STORE CHARACTER IN STRING
-        MOV variableToStore[SI], AL
-        INC SI
-
-        LOOP getFromKBLoop
-
-getStringFromKeyboard ENDM
-
 
 ;;; STRINGTONUM:
 ;;; STRING NATURAL INT  ->
@@ -127,53 +89,224 @@ printSum MACRO intA, intB
 printSum ENDM 
 
 ;;; INT INT ->
-;;; MODIFIES: AX. BX. 
-printModulo MACRO  intA, intB
+;;; MODIFIES: AX. BX. DX. REMAINDER. 
+printPercent MACRO  intA, intB
+
+        ;; PRINT QUOTIENT*100
+        MOV DX, 0
         MOV AX, intA
         DIV intB
-        printNum BX, 10, 2, 4
+        MOV BX, 100
+        MUL BX
+        MOV SI, AX
 
-printModulo ENDM       
+        ;; ADD REMAINDER*100/DIVISOR TO AX.
+        MOV AX, DX
+        MOV DX, 0
+        MUL BX
+        DIV intB
+        MOV remainder, DX
+        ADD AX, SI
+
+        ;; PRINT NUM
+        printNum AX, 10, 2, 6
+
+        ;; PRINT DOT SYMBOL
+        MOV AH, 02H
+        MOV AL, '.'
+        MOV BH, 00
+        MOV BL, 0F0H
+        MOV DH, 10
+        MOV DL, 9
+        INT 10H
+        MOV AH, 0EH
+        INT 10H
+
+        ;; PRINT DECIMAL TO TWO SIG FIGS. 
+        printDecimal remainder, intB, 2, 10, 10
+
+        ;; PRINT PERCENT SYMBOL
+        MOV AH, 02H
+        MOV AL, '%'
+        MOV BH, 00
+        MOV BL, 0F0H
+        MOV DH, 10
+        MOV DL, 12
+        INT 10H
+        MOV AH, 0EH
+        INT 10H
+        
+printPercent ENDM       
 
 ;;; INT INT ->
 ;;; MODIFIES: AX. BX. DX.
 printMultiplication MACRO  intA, intB
+        LOCAL overflow
+        LOCAL exit
+        LOCAL printOverflow
+        LOCAL MTTD
+
+        ;; MAKE MULTIPLICATION
         MOV AX, intA
         MUL intB
+
+        ;; HANDLE OVERFLOW
+        JO overflow
+
+        ;; PRINT AND EXIT IF NO OVERFLOW. 
         printNum AX, 10, 2, 8
+        JMP exit
+
+        ;; SI: OVERFLOW STRING INDEX
+        MOV SI, 6
+        ;; DI: MAXNUM STRING INDEX
+        MOV DI, 4
+
+overflow:
+       
+        ;; STOPPING CONDITION.
+        CMP AX, 0
+        JGE printOverflow
+
+        ;; DIVIDE RESULT BY TEN.
+        MOV DX, 0
+        MOV BX, 10
+        DIV BX
+
+        ;; ADD RESPECTIVE POSITIONS.
+        MOV BX, maxNum[DI]
+        SUB BX, 30H
+        ADD BX, DX
+
+        ;; IF SUM OF DIGITS IS GREATER THAN 10, JMP TO MTTD
+        CMP BL, 10
+        JGE MTTD
+
+        ;; STORE OUTPUT IN OVERFLOWSTRING
+        ADD BL, 30H
+        MOV BL, overflowString[SI]
+        DEC SI
+        DEC DI
+        JMP overflow
+        
+MTTD:
+        SUB BL, 10
+        ADD BL, 30H
+        MOV BL, overflowString[SI]
+        DEC SI
+        DEC DI
+
+        MOV BL, maxNum[DI]
+        INC BL
+        MOV maxNum[DI], BL
+        JMP overflow
+
+printOverflow:
+        printForwards overflowString, 10, 2
+        
+exit:
+        
         
 printMultiplication ENDM
 
 ;;; INT INT ->
-;;; MODIFIES: AX. BX. DX
+;;; MODIFIES: AX. BX. DX. REMAINDER
 printDivision MACRO  intA, intB
+
+        ;; PRINT QUOTIENT
+        MOV DX, 0
         MOV AX, intA
         DIV intB
+        MOV remainder, DX
         printNum AX, 10, 2, 4
-        ;printForwards "    0", 10, 6
-        printNum DX, 10, 10, 4
-        printForwards "/0", 10, 15
-        printNum intA, 10, 16, 4
+
+        ;; PRINT DOT
+        MOV AH, 02H
+        MOV AL, '.'
+        MOV BH, 00
+        MOV BL, 0F0H
+        MOV DH, 10
+        MOV DL, 7
+        INT 10H
+        MOV AH, 0EH
+        INT 10H
+
+        ;; PRINT DECIMAL TO TWO SIG FIGS. 
+        printDecimal remainder, intB, 2, 10, 8
         
 printDivision ENDM
 
+
+        
+printRemainder MACRO remainder, divisor, sigFigs, row, col
+        LOCAL PRL
+
+        ;; ADJUST CURSOR
+        MOV CX, sigFigs
+        MOV AH, 02H
+        MOV BH, 00
+        MOV BL, 0F0H
+        MOV DH, row
+        MOV DL, col
+        INT 10H
+
+PRL:
+        ;; MULTIPLY REMAINDER BY 10
+        MOV AX, remainder
+        MOV BX, 10
+        MUL BX
+
+        ;; DIVIDE MODIFIED REMAINDER BY DIVISOR. RESULT IN AX. 
+        MOV DX, 0
+        DIV divisor
+
+        ;; STORE NEW REMAINDER IN remainder. 
+        MOV remainder, DX
+
+        ;; PRINT CHARACTER IN SCREEN. 
+        MOV AH, 0EH
+        ADD AL, 30H
+        INT 10H
+
+        LOOP PRL
+
+printRemainder ENDM
+
+        
 ;;; INT INT ->
 ;;; MODIFIES: AX.
 printSubstraction MACRO  intA, intB
         LOCAL negative
         LOCAL exit
-        
-        MOV AX, intA
-        SUB AX, intB
-        CMP AX, 0
+
+        ;; IF intA is NOT >= intB, jump to Negative:
+        CMP intA, intB
         JNGE negative
 
+        ;; Print result of substraction.
+        MOV AX, intA
+        SUB AX, intB
         printNum AX, 10, 2, 4
+
+        ;; EXIT
         JMP exit
 
 negative:
-        printForwards "-0", 10, 2
-        printNum AX, 10, 2, 4
+        ;; PRINT NEGATIVE SIGN.
+        MOV AH, 02H
+        MOV AL, '-'
+        MOV BH, 00
+        MOV BL, 0F0H
+        MOV DH, 10
+        MOV DL, 2
+        INT 10H
+        MOV AH, 0EH
+        INT 10H
+
+        ;; MAKE SUBSTRACTION IN REVERSE ORDER. 
+        MOV AX, intB
+        SUB AX, intA
+        printNum AX, 10, 3, 4
 
 exit:   
         
@@ -226,27 +359,25 @@ printNum ENDM
 
         
         ORG 100H
-
-      
-      ;; TODO : ADDITIONS WORK FINE. 
-      ;; TODO : SUBSTRACTIONS (WHERE RESULT IS NEGATIVE) NEEDS IMPROVEMENT     
-      ;; TODO : MULTIPLICATION WORKS WELL WHERE THERE IS NO OVERFLOW 
-      ;; TODO : IN CASE OF OVERFLOW IN MULTIPLICATION, "ADD" 65536 TO RESULT 
-      ;; THROUGH STRINGS. 
-      
       
 ;;; ********************** DATA ****************************
 .DATA
         instructionA DB 'Inserte un numero (3 digitos), un operador'
-                     DB 'y otro numero (3 digitos)', 0
+                     DB ' y otro numero (3 digitos)', 0
 
-        numA DW 900
-        numB DW 090
-        numAString DB '000',  0
-        numBString DB '000',  0
-        operatorString DB '*', 0
-        output DW 0
-        outputString DB '00000', 0  
+        numA      DW 900
+        numB      DW 090
+        remainder DW ?
+        output    DW 0
+        
+        numAString     DB '000',         0
+        numBString     DB '000',         0
+        operatorString DB '*',           0
+        outputString   DB '00000',       0
+        
+        overflowString DB '       ', 0
+        maxNum         DB '65536',   0
+        
         operatorASCII DB 53o
 
 
@@ -302,7 +433,7 @@ printInstructions ENDP
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the first string number
 getInputA PROC
-        getStringFromKeyBoard numAString, 3, 4, 2
+        
         RET
 
 getInputA ENDP 
@@ -314,7 +445,7 @@ getInputA ENDP
 ;;;          The operator must be one of: + / * - %
 ;;; TODO: ENFORCE THAT OPERATOR IS A VALID ONE. SOLVED WITH MOUSE INPUT.
 getOperator PROC
-        getStringFromKeyBoard operatorString, 1, 4, 5
+        
         RET
 
 getOperator ENDP
@@ -325,7 +456,7 @@ getOperator ENDP
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the second string number
 getInputB PROC
-        getStringFromKeyBoard numBString, 3, 4, 6
+       
         RET
 getInputB ENDP
 
