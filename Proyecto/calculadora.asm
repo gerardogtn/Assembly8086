@@ -147,15 +147,21 @@ printPercent ENDM
 ;;; INT INT ->
 ;;; MODIFIES: AX. BX. DX.
 printMultiplication MACRO  intA, intB
+        LOCAL p1
+        LOCAL p2
+        LOCAL p3
+        LOCAL p4
+        LOCAL p5
+        LOCAL p6
+        LOCAL p7
+        LOCAL p8
+        LOCAL p9
+        LOCAL p10
+        LOCAL p11
+        LOCAL p12
+        LOCAL p13
         LOCAL overflow
         LOCAL exit
-        LOCAL printOverflow
-        LOCAL MTTD     
-        
-        ;; SI: OVERFLOW STRING INDEX
-        MOV SI, 6
-        ;; DI: MAXNUM STRING INDEX
-        MOV DI, 4
 
         ;; MAKE MULTIPLICATION
         MOV AX, intA
@@ -171,10 +177,105 @@ printMultiplication MACRO  intA, intB
         
 
 overflow:
-       
+        CMP DX, 1
+        JNZ p2
+        printSumNumString AX, maxNum1, 10, 2
+        JMP exit
+
+p2:     
+        CMP DX, 2
+        JNZ p3
+        printSumNumString AX, maxNum2, 10, 2
+        JMP exit
+
+p3:     
+        CMP DX, 3
+        JNZ p4
+        printSumNumString AX, maxNum3, 10, 2
+        JMP exit
+
+p4:     
+        CMP DX, 4
+        JNZ p5
+        printSumNumString AX, maxNum4, 10, 2
+        JMP exit
+
+p5:     
+        CMP DX, 5
+        JNZ p6
+        printSumNumString AX, maxNum5, 10, 2
+        JMP exit
+
+p6:     
+        CMP DX, 6
+        JNZ p7
+        printSumNumString AX, maxNum6, 10, 2
+        JMP exit
+
+p7:     
+        CMP DX, 7
+        JNZ p8
+        printSumNumString AX, maxNum7, 10, 2
+        JMP exit
+
+p8:     
+        CMP DX, 8
+        JNZ p9
+        printSumNumString AX, maxNum8, 10, 2
+        JMP exit
+
+p9:     
+        CMP DX, 9
+        JNZ p10
+        printSumNumString AX, maxNum9, 10, 2
+        JMP exit
+
+p10:    
+        CMP DX, 10
+        JNZ p11
+        printSumNumString AX, maxNumA, 10, 2
+        JMP exit
+
+p11:    
+        CMP DX, 11
+        JNZ p12
+        printSumNumString AX, maxNumB, 10, 2
+        JMP exit
+
+p12:    
+        CMP DX, 12
+        JNZ p13
+        printSumNumString AX, maxNumC, 10, 2
+        JMP exit
+
+p13:    
+        CMP DX, 13
+        printSumNumString AX, maxNumD, 10, 2
+        
+exit:
+        
+        
+printMultiplication ENDM
+
+
+
+        
+printSumNumString MACRO numA, stringA, row, col
+        LOCAL overflow
+        LOCAL modifyOutput
+        LOCAL exit
+        
+        MOV AX, numA
+        
+        ;; SI: OVERFLOW STRING INDEX
+        MOV SI, 6
+        ;; DI: MAXNUM STRING INDEX
+        MOV DI, 6
+
+overflow:       
         ;; STOPPING CONDITION.
-        CMP AX, 0
-        JNG printOverflow
+        CMP DI, 0
+        JNG exit
 
         ;; DIVIDE RESULT BY TEN.
         MOV DX, 0
@@ -189,7 +290,7 @@ overflow:
 
         ;; IF SUM OF DIGITS IS GREATER THAN 10, JMP TO MTTD
         CMP BL, 10
-        JGE MTTD
+        JGE modifyOutput
 
         ;; STORE OUTPUT IN OVERFLOWSTRING
         ADD BL, 30H
@@ -198,7 +299,8 @@ overflow:
         DEC DI
         JMP overflow
         
-MTTD:
+modifyOutput:
+        
         SUB BL, 10
         ADD BL, 30H
         MOV overflowString[SI], BL
@@ -210,14 +312,13 @@ MTTD:
         MOV maxNum[DI], BL
         JMP overflow
 
-printOverflow:
-        printForwards overflowString, 10, 2
-        
 exit:
-        
-        
-printMultiplication ENDM
 
+        printForwards overflowString, row, col
+
+printSumNumString ENDM
+        
+        
 ;;; INT INT ->
 ;;; MODIFIES: AX. BX. DX. REMAINDER
 printDivision MACRO  intA, intB
@@ -284,17 +385,19 @@ printDecimal ENDM
         
 ;;; INT INT ->
 ;;; MODIFIES: AX.
-printSubstraction MACRO intA, intC
+printSubstraction MACRO intA, intB
         LOCAL negative
         LOCAL exit
 
+        MOV AX, intA
+        MOV BX, intB
+
         ;; IF intA is NOT >= intB, jump to Negative:
-        CMP  intA, intC
+        CMP AX, BX
         JNGE negative
 
         ;; Print result of substraction.
-        MOV AX, intA
-        SUB AX, intB
+        SUB AX, BX
         printNum AX, 10, 2, 4
 
         ;; EXIT
@@ -315,6 +418,8 @@ negative:
         ;; MAKE SUBSTRACTION IN REVERSE ORDER. 
         MOV AX, intB
         SUB AX, intA
+
+        ;; PRINT OUTPUT
         printNum AX, 10, 3, 4
 
 exit:   
@@ -384,8 +489,21 @@ printNum ENDM
         operatorString DB '*',           0
         outputString   DB '00000',       0
         
-        overflowString DB '       ', 0
-        maxNum         DB '65536',   0
+        overflowString  DB '       ', 0
+        maxNum1         DB '0065536',   0
+        maxNum2         DB '0131072',   0
+        maxNum3         DB '0196608',   0
+        maxNum4         DB '0262144',   0
+        maxNum5         DB '0327680',   0
+        maxNum6         DB '0393216',   0
+        maxNum7         DB '0458752',   0
+        maxNum8         DB '0524288',   0
+        maxNum9         DB '0589824',   0
+        maxNumA         DB '0655360',   0
+        maxNumB         DB '0720896',   0
+        maxNumC         DB '0786432',   0
+        maxNumD         DB '0851968',   0
+        
         
         operatorASCII DB ?
 
@@ -531,7 +649,7 @@ H:
 I:      
         CMP operatorASCII, 55O
         JNZ J
-       ; printSubstraction numA, numB
+        printSubstraction numA, numB 
         
         ;; ELSE: DOES NOTHING
 
