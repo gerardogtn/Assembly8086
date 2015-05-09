@@ -28,8 +28,7 @@ main PROC
         MOV BH, 00H
         MOV BL, 0F0H
         MOV CX, 0
-        MOV DH, 4
-        MOV DL, 4 
+        MOV DH, 4      MOV DL, 4 
         INT 10H
           
         MOV AH, 0EH
