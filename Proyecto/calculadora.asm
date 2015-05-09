@@ -84,7 +84,7 @@ printSum MACRO intA, intB
         
         MOV AX, intA
         ADD AX, intB
-        printNum AX, 10, 2, 6
+        printNum AX, 10, 2, 14
         
 printSum ENDM 
 
@@ -110,21 +110,21 @@ printPercent MACRO  intA, intB
         ADD SI, AX
 
         ;; PRINT NUM
-        printNum SI, 10, 2, 6
+        printNum SI, 10, 2, 14
 
         ;; PRINT DOT SYMBOL
         MOV AH, 02H
         MOV AL, '.'
         MOV BH, 00
         MOV BL, 0F0H
-        MOV DH, 10
-        MOV DL, 9
+        MOV DH, 2
+        MOV DL, 20
         INT 10H
         MOV AH, 0EH
         INT 10H
 
         ;; PRINT DECIMAL TO TWO SIG FIGS. 
-        printDecimal remainder, intB, 2, 10, 10
+        printDecimal remainder, intB, 2, 2, 21
 
         ;; PRINT PERCENT SYMBOL
         MOV AH, 02H
@@ -171,7 +171,7 @@ printMultiplication MACRO  intA, intB
         JO overflow
 
         ;; PRINT AND EXIT IF NO OVERFLOW. 
-        printNum AX, 10, 2, 8
+        printNum AX, 10, 2, 14
         JMP exit
 
         
@@ -323,7 +323,7 @@ modifyOutput:
 
 exit:
 
-        printForwards overflowString, 10,2
+        printForwards overflowString, 2, 14
 
 printSumNumString ENDM
         
@@ -337,21 +337,21 @@ printDivision MACRO  intA, intB
         MOV AX, intA
         DIV intB
         MOV remainder, DX
-        printNum AX, 10, 2, 4
+        printNum AX, 2, 14, 4
 
         ;; PRINT DOT
         MOV AH, 02H
         MOV AL, '.'
         MOV BH, 00
         MOV BL, 0F0H
-        MOV DH, 10
-        MOV DL, 7
+        MOV DH, 2
+        MOV DL, 19
         INT 10H
         MOV AH, 0EH
         INT 10H
 
         ;; PRINT DECIMAL TO TWO SIG FIGS. 
-        printDecimal remainder, intB, 2, 10, 8
+        printDecimal remainder, intB, 2, 2, 20
         
 printDivision ENDM
 
@@ -407,7 +407,7 @@ printSubstraction MACRO intA, intB
 
         ;; Print result of substraction.
         SUB AX, BX
-        printNum AX, 10, 2, 4
+        printNum AX, 2, 15, 4
 
         ;; EXIT
         JMP exit
@@ -418,8 +418,8 @@ negative:
         MOV AL, '-'
         MOV BH, 00
         MOV BL, 0F0H
-        MOV DH, 10
-        MOV DL, 2
+        MOV DH, 2
+        MOV DL, 14
         INT 10H
         MOV AH, 0EH
         INT 10H
@@ -429,7 +429,7 @@ negative:
         SUB AX, intA
 
         ;; PRINT OUTPUT
-        printNum AX, 10, 3, 4
+        printNum AX, 2, 15, 4
 
 exit:   
         
@@ -480,18 +480,272 @@ printExit:
 
 printNum ENDM 
 
+
+handleMouse MACRO isNum, numString, R, C
+        LOCAL getNumber
+        LOCAL getOperator
+        LOCAL MNA
+        LOCAL exit
+
+        LOCAL dos
+        LOCAL tres
+        LOCAL cuatro
+        LOCAL cinco
+        LOCAL seis
+        LOCAL siete
+        LOCAL ocho
+        LOCAL nueve
+        LOCAL cero
+
+        LOCAL menos
+        LOCAL por
+        LOCAL entre
+        LOCAL porciento
+
+        ;; START MOUSE TRACKING
+        MOV AX, 0
+        INT 33H
+        CMP AX, 0
+        JE MNA   
+        
+        ;; DISPLAY MOUSE
+        MOV AX, 1
+        INT 33H
+
+        ;; IF isNum is 0. Get Number. Else, operator.
+        CMP isNum, 0
+        JNE getOperator
+
+
+        ;; GET A THREE DIGIT NUMBER
+        MOV DI, 0
+getNumber:
+        CMP DI, 2
+        JG  exit
+
+        ;; GET MOUSE COORDINATES
+        MOV AX, 03
+        MOV BX, 0
+        INT 33H
+        CMP BX, 1
+        JNE getNumber
+
+        ;; GET COLUMN. 
+        MOV AX, xCoord
+        MOV DX, 0
+        MOV BX, 8
+        DIV BX
+        MOV xCoord, AX
+
+        ;; GET ROW
+        MOV AX, yCoord
+        MOV DX, 0
+        MOV BX, 8
+        DIV BX
+        MOV yCoord, AX
+        
+        CMP xCoord, 3
+        JL getNumber
+        CMP yCoord, 17
+        JG getNumber
+        CMP yCoord, 7
+        JL getNumber
+
+        CMP yCoord, 12
+        JGE seis
+        
+        ;; isOne?
+        CMP xCoord, 10
+        JG dos
+        
+        ;; handleOne
+        MOV numString[DI], '1'
+        INC DI
+        JMP getNumber
+        
+        
+dos:
+        CMP xCoord, 17
+        JG tres
+        MOV numString[DI], '2'
+        INC DI
+        JMP getNumber
+
+tres:
+        CMP xCoord, 24
+        JG cuatro
+        MOV numString[DI], '3'
+        INC DI
+        JMP getNumber
+        
+cuatro:
+        CMP xCoord, 31
+        JG cinco
+        MOV numString[DI], '4'
+        INC DI
+        JMP getNumber
+        
+cinco:
+        CMP xCoord, 38
+        JG getNumber
+        MOV numString[DI], '5'
+        INC DI
+        JMP getNumber
+
+seis:
+        CMP xCoord, 10
+        JG tres
+        MOV numString[DI], '6'
+        INC DI
+        JMP getNumber
+siete:
+        CMP xCoord, 17
+        JG ocho
+        MOV numString[DI], '7'
+        INC DI
+        JMP getNumber
+        
+ocho:
+        CMP xCoord, 24
+        JG nueve
+        MOV numString[DI], '8'
+        INC DI
+        JMP getNumber
+nueve:
+        CMP xCoord, 31
+        JG cero
+        MOV numString[DI], '9'
+        INC DI
+        JMP getNumber
+        
+cero:
+        CMP xCoord, 38
+        JG getNumber
+        MOV numString[DI], '0'
+        INC DI
+        JMP getNumber
+
+        
+getOperator:    
+
+        ;; GET MOUSE COORDINATES
+        MOV AX, 03
+        MOV BX, 0
+        INT 33H
+        CMP BX, 1
+        JNE getOperator
+
+        ;; GET COLUMN. 
+        MOV AX, xCoord
+        MOV DX, 0
+        MOV BX, 8
+        DIV BX
+        MOV xCoord, AX
+
+        ;; GET ROW
+        MOV AX, yCoord
+        MOV DX, 0
+        MOV BX, 8
+        DIV BX
+        MOV yCoord, AX
+
+        CMP xCoord, 3
+        JL getOperator
+        CMP yCoord, 17
+        JLE getOperator
+
+        
+        ;; isMas?
+        CMP xCoord, 10
+        JG menos
+        
+        ;; handleMas
+        MOV numString[0], '+'
+        JMP exit
+        
+menos:
+        ;; isMenos?
+        CMP xCoord, 17
+        JG por
+        ;; handleMenos
+        MOV numString[0], '-'
+        JMP exit
+
+por:
+        ;; isPor?
+        CMP xCoord, 24
+        JG entre
+        ;; handlePor
+        MOV numString[0], '*'
+        JMP exit
+        
+entre:
+        ;; isEntre?
+        CMP xCoord, 31
+        JG porciento
+        ;; handleEntre
+        MOV numString[0], '/'
+        JMP exit
+        
+porciento:
+        ;; isPercent?
+        CMP xCoord, 38
+        JG getOperator
+        ;; handlePercent
+        MOV numString[0], '%'
+        JMP exit
+
+MNA:
+        printForwards mouseError, 2, 5
+        RET
+
+exit:
+        printForwards numString, R, C
+
+handleMouse ENDM
+        
         
         ORG 100H
       
 ;;; ********************** DATA ****************************
 .DATA
-        instructionA DB 'Inserte un numero (3 digitos), un operador'
-                     DB ' y otro numero (3 digitos)', 0
 
+     calc db '| ------------------------------------ |', 0dh,
+          db '| |                                  | |', 0dh,      
+          db '| |                                  | |', 0dh, 
+          db '| |                                  | |',0dh
+          db '| ------------------------------------ |', 0dh, 
+          db '|   ___________________________________|', 0dh, 
+          db '|  |  **  | *****| *****| *   *| *****||', 0dh, 
+          db '|  |   *  |     *|     *| *   *| *    ||', 0dh,
+          db '|  |   *  | *****| *****| *****| *****||', 0dh,
+          db '|  |   *  | *    |     *|     *|     *||', 0dh, 
+          db '|  |******| *****| *****|     *| *****||', 0dh,
+          db '|  |-----|------|------|------|-----||', 0dh,
+          db '|  | *****| *****| *****| *****| *****||', 0dh,
+          db '|  | *    |     *| *   *| *   *| *  **||', 0dh,
+          db '|  | *****|    * | *****| *****| * * *||', 0dh,
+          db '|  | *   *|   *  | *   *|     *| **  *||', 0dh, 
+          db '|  | *****   *   | *****|     *| *****|||', 0dh,
+          db '|  |------|------|------|------|------||', 0dh, 
+          db '|  |  **  |      |*    *|     *|**   *||', 0dh,
+          db '|  |  **  |      | *  * |    * |**  * ||', 0dh,
+          db '|  |******|******|  **  |   *  |   *  ||', 0dh,
+          db '|  |  **  |      | *  * |  *   |  * **||', 0dh,
+          db '|  |  **  |      |*    *| *    | *  **||', 0dh,     
+          db '---------------------------------------$'
+
+
+        
+        mouseError DB 'El mouse no esta disponible', 0
+
+        
         numA      DW 900
         numB      DW 999
         remainder DW ?
         output    DW 0
+        yCoord    DW 0
+        xCoord    DW 0
         
         numAString     DB '000',         0
         numBString     DB '000',         0
@@ -526,14 +780,12 @@ printNum ENDM
 ;;; MAIN: starts program. 
 main PROC
         CALL startVideoMode
-        ;CALL printInstructions
-        ;CALL getInputA
-        ;CALL getOperator
-        ;CALL getInputB
-        ;CALL inputStringToNum   
-        printNum numA, 2, 2, 3
-        printForwards operatorString, 2, 6
-        printNum numB, 2, 7, 3  
+        CALL printInstructions
+        CALL getInputA
+        CALL getOperator
+        CALL getInputB
+        printForwards "=0", 2, 12
+        CALL inputStringToNum  
         CALL printOperation
         RET
 main ENDP
@@ -546,7 +798,7 @@ main ENDP
 ;;; Starts wide video mode. 
 startVideoMode PROC
         MOV AH, 00H
-        MOV AL, 03H
+        MOV AL, 00H
         INT 10H
         RET
 startVideoMode ENDP 
@@ -560,7 +812,9 @@ startVideoMode ENDP
         
 ;;; TODO: PROCEDURE.
 printInstructions PROC
-        printForwards instructionA, 2, 2
+        MOV AH, 09H
+        MOV DX, offset calc
+        INT 21H
         RET
 printInstructions ENDP
 
@@ -571,9 +825,8 @@ printInstructions ENDP
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the first string number
 getInputA PROC
-        
+        handleMouse 1, numAString, 2, 4
         RET
-
 getInputA ENDP 
 
 ;;; GETOPERATOR:
@@ -583,9 +836,8 @@ getInputA ENDP
 ;;;          The operator must be one of: + / * - %
 ;;; TODO: ENFORCE THAT OPERATOR IS A VALID ONE. SOLVED WITH MOUSE INPUT.
 getOperator PROC
-        
+        handleMouse 0, operatorString, 2, 7
         RET
-
 getOperator ENDP
 
 ;;; GETINPUTB:
@@ -594,7 +846,7 @@ getOperator ENDP
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the second string number
 getInputB PROC
-       
+        handleMouse 1, numAString, 2, 8
         RET
 getInputB ENDP
 
@@ -668,29 +920,6 @@ J:
 
 printOperation ENDP
         
-
-;;; OUTPUTTOSTRING
-;;; REQUIRES: Output is a valid number. 
-;;; MODIFIES: OutputString. 
-;;;  EFFECTS: Gets the output string from output. 
-;;;
-                
-;;; TODO: PROCEDURE. CREATE A MACRO. 
-outputToString PROC
-        ;; STUB
-        RET
-outputToString ENDP
-
-;;; DISPLAYOUTPUT
-;;; ASSUMES:  outputString is correct.
-;;; REQUIRES: None.
-;;; MODIFIES:
-;;; EFFECTS:  Prints to screen the output string. 
-;;; Displays in screen
-displayOutput PROC
-        printForwards outputString, 13, 2
-        RET
-displayOutput ENDP
         
         
         END main
