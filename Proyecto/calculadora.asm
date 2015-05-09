@@ -138,18 +138,28 @@ printPercent MACRO  intA, intB
         INT 10H
         
 printPercent ENDM       
-
+                  
+                  
+                  
+;; TODO: MULTIPLY MAXNUM TIMES DX AFTER
+;; MULTIPLICATION IS DONE. 
+                  
 ;;; INT INT ->
 ;;; MODIFIES: AX. BX. DX.
 printMultiplication MACRO  intA, intB
         LOCAL overflow
         LOCAL exit
         LOCAL printOverflow
-        LOCAL MTTD
+        LOCAL MTTD     
+        
+        ;; SI: OVERFLOW STRING INDEX
+        MOV SI, 6
+        ;; DI: MAXNUM STRING INDEX
+        MOV DI, 4
 
         ;; MAKE MULTIPLICATION
         MOV AX, intA
-        MUL intB
+        MUL intB  
 
         ;; HANDLE OVERFLOW
         JO overflow
@@ -158,26 +168,24 @@ printMultiplication MACRO  intA, intB
         printNum AX, 10, 2, 8
         JMP exit
 
-        ;; SI: OVERFLOW STRING INDEX
-        MOV SI, 6
-        ;; DI: MAXNUM STRING INDEX
-        MOV DI, 4
+        
 
 overflow:
        
         ;; STOPPING CONDITION.
         CMP AX, 0
-        JGE printOverflow
+        JNG printOverflow
 
         ;; DIVIDE RESULT BY TEN.
         MOV DX, 0
         MOV BX, 10
-        DIV BX
+        DIV BX 
+        MOV remainder, DX
 
         ;; ADD RESPECTIVE POSITIONS.
-        MOV BX, maxNum[DI]
-        SUB BX, 30H
-        ADD BX, DX
+        MOV BL,maxNum[DI]
+        SUB BL, 30H
+        ADD BX, remainder
 
         ;; IF SUM OF DIGITS IS GREATER THAN 10, JMP TO MTTD
         CMP BL, 10
@@ -185,7 +193,7 @@ overflow:
 
         ;; STORE OUTPUT IN OVERFLOWSTRING
         ADD BL, 30H
-        MOV BL, overflowString[SI]
+        MOV overflowString[SI], BL
         DEC SI
         DEC DI
         JMP overflow
@@ -193,7 +201,7 @@ overflow:
 MTTD:
         SUB BL, 10
         ADD BL, 30H
-        MOV BL, overflowString[SI]
+        MOV overflowString[SI], BL
         DEC SI
         DEC DI
 
@@ -367,13 +375,13 @@ printNum ENDM
                      DB ' y otro numero (3 digitos)', 0
 
         numA      DW 900
-        numB      DW 091
+        numB      DW 900
         remainder DW ?
         output    DW 0
         
         numAString     DB '000',         0
         numBString     DB '000',         0
-        operatorString DB '%',           0
+        operatorString DB '*',           0
         outputString   DB '00000',       0
         
         overflowString DB '       ', 0
@@ -511,7 +519,8 @@ G:
         
         
         ;; HANDLES *                 
-H:      
+H:              
+        INT 3 
         CMP operatorASCII, 52O
         JNZ I
         printMultiplication numA, numB
