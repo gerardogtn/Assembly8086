@@ -24,31 +24,49 @@ main PROC
         INT 10H
 
         ;; PRINT ONE
-        MOV AH, 0EH
-        MOV AL, '1'
+        MOV AH, 02H
         MOV BH, 00H
         MOV BL, 0F0H
         MOV CX, 0
         MOV DH, 4
-        MOV DL, 4
+        MOV DL, 4 
+        INT 10H
+          
+        MOV AH, 0EH
+        MOV AL, '1'
         INT 10H
 
         ;; PRINT TWO
-        MOV AH, 0EH
-        MOV AL, '2'
+        MOV AH, 02H
         MOV BH, 00H
         MOV BL, 0F0H
         MOV CX, 0
         MOV DH, 8
         MOV DL, 8
-        INT 10H
-
-mouse:
+        INT 10H 
         
-        MOV AX, 5
-        MOV BX, 0
+        MOV AH, 0EH
+        MOV AL, '2'
+        INT 10H
+  
+        ;; START MOUSE TRACKING
+        MOV AX, 0
         INT 33H
         CMP AX, 0
+        JE MNA   
+        
+        ;; DISPLAY MOUSE
+        MOV AX, 1
+        INT 33H
+  
+  
+mouse:
+              
+        MOV AH, 00          
+        MOV AL, 3
+        MOV BX, 0
+        INT 33H
+        CMP BX, 1
         JNE mouse
 
         MOV xCoordinate, CX
@@ -66,38 +84,61 @@ mouse:
         DIV BX
         MOV yCoordinate, AX
 
-        CMP xCoordinate, 2
+        CMP xCoordinate, 4
         JNE next
-        CMP yCoordinate, 2
+        CMP yCoordinate, 4
         JNE next
 
         ;; PRINT ONE. 
-        MOV AH, 0EH
-        MOV AL, '1'
+        MOV AH, 02H
         MOV BH, 00H
         MOV BL, 0F0H
         MOV CX, 0
         MOV DH, 10
-        MOV DL, 2
+        MOV DL, 2 
         INT 10H
-        JMP exit
+          
+        MOV AH, 0EH
+        MOV AL, '1'
+        INT 10H      
+        JMP EXIT
 
 next:   
-        CMP xCoordinate, 2
+        CMP xCoordinate, 8
         JNE mouse
-        CMP yCoordinate, 2
+        CMP yCoordinate, 8
         JNE mouse
 
         ;; PRINT TWO. 
-        MOV AH, 0EH
-        MOV AL, '2'
+        MOV AH, 02H
         MOV BH, 00H
         MOV BL, 0F0H
         MOV CX, 0
         MOV DH, 10
-        MOV DL, 2
+        MOV DL, 2 
         INT 10H
-
+          
+        MOV AH, 0EH
+        MOV AL, '2'
+        INT 10H  
+        JMP exit      
+        
+  
+MNA:
+        MOV AH, 02H
+        MOV BH, 00H
+        MOV BL, 0F0H
+        MOV CX, 0
+        MOV DH, 10
+        MOV DL, 2 
+        INT 10H
+          
+        MOV AH, 0EH
+        MOV AL, 'A'
+        INT 10H 
+        
+  
+  
 exit:     
         
         RET
