@@ -179,78 +179,87 @@ printMultiplication MACRO  intA, intB
 overflow:
         CMP DX, 1
         JNZ p2
-        printSumNumString AX, maxNum1, 10, 2
+        printSumNumString AX, maxNum1
         JMP exit
 
 p2:     
         CMP DX, 2
         JNZ p3
-        printSumNumString AX, maxNum2, 10, 2
+        printSumNumString AX, maxNum2
         JMP exit
 
 p3:     
         CMP DX, 3
         JNZ p4
-        printSumNumString AX, maxNum3, 10, 2
+        printSumNumString AX, maxNum3
         JMP exit
 
 p4:     
         CMP DX, 4
         JNZ p5
-        printSumNumString AX, maxNum4, 10, 2
+        printSumNumString AX, maxNum4
         JMP exit
 
 p5:     
         CMP DX, 5
         JNZ p6
-        printSumNumString AX, maxNum5, 10, 2
+        printSumNumString AX, maxNum5
         JMP exit
 
 p6:     
         CMP DX, 6
         JNZ p7
-        printSumNumString AX, maxNum6, 10, 2
+        printSumNumString AX, maxNum6
         JMP exit
 
 p7:     
         CMP DX, 7
         JNZ p8
-        printSumNumString AX, maxNum7, 10, 2
+        printSumNumString AX, maxNum7
         JMP exit
 
 p8:     
         CMP DX, 8
         JNZ p9
-        printSumNumString AX, maxNum8, 10, 2
+        printSumNumString AX, maxNum8
         JMP exit
 
 p9:     
         CMP DX, 9
         JNZ p10
-        printSumNumString AX, maxNum9, 10, 2
+        printSumNumString AX, maxNum9
         JMP exit
 
 p10:    
         CMP DX, 10
         JNZ p11
-        printSumNumString AX, maxNumA, 10, 2
+        printSumNumString AX, maxNumA
         JMP exit
 
 p11:    
         CMP DX, 11
         JNZ p12
-        printSumNumString AX, maxNumB, 10, 2
+        printSumNumString AX, maxNumB
         JMP exit
 
 p12:    
         CMP DX, 12
         JNZ p13
-        printSumNumString AX, maxNumC, 10, 2
+        printSumNumString AX, maxNumC
         JMP exit
 
 p13:    
-        CMP DX, 13
-        printSumNumString AX, maxNumD, 10, 2
+        CMP DX, 13     
+        JNZ p14
+        printSumNumString AX, maxNumD 
+        
+p14:
+        CMP DX, 14
+        JNZ p15
+        printSumNumString AX, maxNumE
+        
+p15: 
+        printSumNumString AX, maxNumF
         
 exit:
         
@@ -260,7 +269,7 @@ printMultiplication ENDM
 
 
         
-printSumNumString MACRO numA, stringA, row, col
+printSumNumString MACRO numA, stringA
         LOCAL overflow
         LOCAL modifyOutput
         LOCAL exit
@@ -284,7 +293,7 @@ overflow:
         MOV remainder, DX
 
         ;; ADD RESPECTIVE POSITIONS.
-        MOV BL,maxNum[DI]
+        MOV BL,stringA[DI]
         SUB BL, 30H
         ADD BX, remainder
 
@@ -307,14 +316,14 @@ modifyOutput:
         DEC SI
         DEC DI
 
-        MOV BL, maxNum[DI]
+        MOV BL, stringA[DI]
         INC BL
-        MOV maxNum[DI], BL
+        MOV stringA[DI], BL
         JMP overflow
 
 exit:
 
-        printForwards overflowString, row, col
+        printForwards overflowString, 10,2
 
 printSumNumString ENDM
         
@@ -480,13 +489,13 @@ printNum ENDM
                      DB ' y otro numero (3 digitos)', 0
 
         numA      DW 900
-        numB      DW 900
+        numB      DW 999
         remainder DW ?
         output    DW 0
         
         numAString     DB '000',         0
         numBString     DB '000',         0
-        operatorString DB '*',           0
+        operatorString DB '-',           0
         outputString   DB '00000',       0
         
         overflowString  DB '       ', 0
@@ -502,7 +511,9 @@ printNum ENDM
         maxNumA         DB '0655360',   0
         maxNumB         DB '0720896',   0
         maxNumC         DB '0786432',   0
-        maxNumD         DB '0851968',   0
+        maxNumD         DB '0851968',   0 
+        maxNumE         DB '0917504',   0
+        maxNumF         DB '0983040',   0
         
         
         operatorASCII DB ?
@@ -637,8 +648,7 @@ G:
         
         
         ;; HANDLES *                 
-H:              
-        INT 3 
+H:             
         CMP operatorASCII, 52O
         JNZ I
         printMultiplication numA, numB
