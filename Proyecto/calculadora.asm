@@ -91,25 +91,26 @@ printSum ENDM
 ;;; INT INT ->
 ;;; MODIFIES: AX. BX. DX. REMAINDER. 
 printPercent MACRO  intA, intB
-
+              
         ;; PRINT QUOTIENT*100
         MOV DX, 0
         MOV AX, intA
         DIV intB
-        MOV BX, 100
+        MOV BX, 100 
+        MOV remainder, DX
         MUL BX
         MOV SI, AX
 
         ;; ADD REMAINDER*100/DIVISOR TO AX.
-        MOV AX, DX
+        MOV AX, remainder
         MOV DX, 0
         MUL BX
         DIV intB
         MOV remainder, DX
-        ADD AX, SI
+        ADD SI, AX
 
         ;; PRINT NUM
-        printNum AX, 10, 2, 6
+        printNum SI, 10, 2, 6
 
         ;; PRINT DOT SYMBOL
         MOV AH, 02H
@@ -238,7 +239,7 @@ printDivision ENDM
 
 
         
-printRemainder MACRO remainder, divisor, sigFigs, row, col
+printDecimal MACRO remainder, divisor, sigFigs, row, col
         LOCAL PRL
 
         ;; ADJUST CURSOR
@@ -270,17 +271,17 @@ PRL:
 
         LOOP PRL
 
-printRemainder ENDM
+printDecimal ENDM
 
         
 ;;; INT INT ->
 ;;; MODIFIES: AX.
-printSubstraction MACRO  intA, intB
+printSubstraction MACRO intA, intC
         LOCAL negative
         LOCAL exit
 
         ;; IF intA is NOT >= intB, jump to Negative:
-        CMP intA, intB
+        CMP  intA, intC
         JNGE negative
 
         ;; Print result of substraction.
@@ -366,19 +367,19 @@ printNum ENDM
                      DB ' y otro numero (3 digitos)', 0
 
         numA      DW 900
-        numB      DW 090
+        numB      DW 091
         remainder DW ?
         output    DW 0
         
         numAString     DB '000',         0
         numBString     DB '000',         0
-        operatorString DB '*',           0
+        operatorString DB '%',           0
         outputString   DB '00000',       0
         
         overflowString DB '       ', 0
         maxNum         DB '65536',   0
         
-        operatorASCII DB 53o
+        operatorASCII DB ?
 
 
 
@@ -494,10 +495,10 @@ printOperation PROC
         
         ;; HANDLES %
 
-F:      
+F:          
         CMP operatorASCII, 45O
         JNZ G
-        printModulo numA, numB
+        printPercent numA, numB
         RET         
         
         ;; HANDLES /
@@ -509,7 +510,7 @@ G:
         RET     
         
         
-        ;; HANDLES *                 O
+        ;; HANDLES *                 
 H:      
         CMP operatorASCII, 52O
         JNZ I
@@ -521,7 +522,7 @@ H:
 I:      
         CMP operatorASCII, 55O
         JNZ J
-        printSubstraction numA, numB
+       ; printSubstraction numA, numB
         
         ;; ELSE: DOES NOTHING
 
