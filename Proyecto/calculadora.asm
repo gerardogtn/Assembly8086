@@ -37,7 +37,7 @@ printForwards MACRO MSG, ROW, COL
 printLoop:
         MOV AL, MSG[SI]
 
-        CMP AL, 0
+        CMP AL, 0DH
         JZ printExit
         
         MOV AH, 0EH
@@ -57,24 +57,31 @@ printForwards ENDM
 ;;; REQUIRES: THE STRING IS MADE OF DIGITS. SIZE IS SIZE OF THE STRING.
 ;;; MODIFIES: numberVar. SI. AH. CX. BL
 ;;; EFFECTS:  TRANSFORMS THE NUMBER STRING TO A NUMBER. 
-stringToNum MACRO numberString, size, numberVar
-        LOCAL STNL
-
-        MOV SI, 00 
+stringToNum MACRO string, integer
+        LOCAL exit
+        LOCAL start
+            
+            
+        MOV SI, 0
+        MOV BX, 10    
+start:  
+        
+        MOV AL, string[SI]
+        CMP AL, 0DH
+        JE exit
+        
+        SUB AL, 30H
         MOV AH, 00
-        MOV AL, 10
-        MOV CX, size
-        MOV numberVar, 0
-
-STNL:              
-        MUL numberVar 
-        MOV numberVar, AX 
-        MOV BL, numberString[SI]
-        SUB BL, 30H   
-        MOV BH, 0
-        ADD numberVar, BX
+        MOV DI, AX
+        MOV AX, integer
+        MUL BX
+        ADD AX, DI
+        MOV integer, AX
         INC SI
-        LOOP STNL
+        JMP start
+
+exit:
+        
 
 stringToNum ENDM
         
@@ -84,7 +91,7 @@ printSum MACRO intA, intB
         
         MOV AX, intA
         ADD AX, intB
-        printNum AX, 10, 2, 14
+        printNum AX, 2, 14, 6
         
 printSum ENDM 
 
@@ -110,7 +117,7 @@ printPercent MACRO  intA, intB
         ADD SI, AX
 
         ;; PRINT NUM
-        printNum SI, 10, 2, 14
+        printNum SI, 2, 14, 6
 
         ;; PRINT DOT SYMBOL
         MOV AH, 02H
@@ -118,21 +125,21 @@ printPercent MACRO  intA, intB
         MOV BH, 00
         MOV BL, 0F0H
         MOV DH, 2
-        MOV DL, 20
+        MOV DL, 21
         INT 10H
         MOV AH, 0EH
         INT 10H
 
         ;; PRINT DECIMAL TO TWO SIG FIGS. 
-        printDecimal remainder, intB, 2, 2, 21
+        printDecimal remainder, intB, 2, 2, 22
 
         ;; PRINT PERCENT SYMBOL
         MOV AH, 02H
         MOV AL, '%'
         MOV BH, 00
         MOV BL, 0F0H
-        MOV DH, 10
-        MOV DL, 12
+        MOV DH, 2
+        MOV DL, 25
         INT 10H
         MOV AH, 0EH
         INT 10H
@@ -171,7 +178,7 @@ printMultiplication MACRO  intA, intB
         JO overflow
 
         ;; PRINT AND EXIT IF NO OVERFLOW. 
-        printNum AX, 10, 2, 14
+        printNum AX, 2, 14, 7
         JMP exit
 
         
@@ -481,7 +488,7 @@ printExit:
 printNum ENDM 
 
 
-handleMouse MACRO isNum, numString, R, C
+handleMouse MACRO isNum, numString
         LOCAL getNumber
         LOCAL getOperator
         LOCAL MNA
@@ -514,7 +521,7 @@ handleMouse MACRO isNum, numString, R, C
 
         ;; IF isNum is 0. Get Number. Else, operator.
         MOV AL, isNum
-        CMP AL, 0
+        CMP AL, 1
         JNE getOperator
 
 
@@ -531,8 +538,10 @@ getNumber:
         INT 33H
         CMP BX, 1
         JNE getNumber
-          
-        INT 3  
+                      
+        MOV xCoord, CX
+        MOV yCoord, DX              
+                      
         ;; GET COLUMN. 
         MOV AX, xCoord
         MOV DX, 0
@@ -597,7 +606,7 @@ cinco:
 
 seis:
         CMP xCoord, 10
-        JG tres
+        JG  siete
         MOV numString[DI], '6'
         INC DI
         JMP getNumber
@@ -636,7 +645,10 @@ getOperator:
         MOV BX, 0
         INT 33H
         CMP BX, 1
-        JNE getOperator
+        JNE getOperator   
+        
+        MOV xCoord, CX
+        MOV yCoord, DX  
 
         ;; GET COLUMN. 
         MOV AX, xCoord
@@ -703,9 +715,6 @@ MNA:
         RET
 
 exit:          
-        MOV AX, R
-        MOV BX, C
-        printForwards numString, AX, BX
 
 handleMouse ENDM
         
@@ -718,7 +727,7 @@ handleMouse ENDM
      calc db '| ------------------------------------ |', 0dh,
           db '| |                                  | |', 0dh,      
           db '| |                                  | |', 0dh, 
-          db '| |                                  | |',0dh
+          db '| |                                  | |', 0dh
           db '| ------------------------------------ |', 0dh, 
           db '|   ___________________________________|', 0dh, 
           db '|  |  **  | *****| *****| *   *| *****||', 0dh, 
@@ -726,12 +735,12 @@ handleMouse ENDM
           db '|  |   *  | *****| *****| *****| *****||', 0dh,
           db '|  |   *  | *    |     *|     *|     *||', 0dh, 
           db '|  |******| *****| *****|     *| *****||', 0dh,
-          db '|  |--Â–---|------|------|------|--Â–---||', 0dh,
+          db '|  |--Â---|------|------|------|--Â---||', 0dh,
           db '|  | *****| *****| *****| *****| *****||', 0dh,
           db '|  | *    |     *| *   *| *   *| *  **||', 0dh,
           db '|  | *****|    * | *****| *****| * * *||', 0dh,
           db '|  | *   *|   *  | *   *|     *| **  *||', 0dh, 
-          db '|  | *****   *   | *****|     *| *****|||', 0dh,
+          db '|  | *****   *   | *****|     *| *****||', 0dh,
           db '|  |------|------|------|------|------||', 0dh, 
           db '|  |  **  |      |*    *|     *|**   *||', 0dh,
           db '|  |  **  |      | *  * |    * |**  * ||', 0dh,
@@ -745,34 +754,34 @@ handleMouse ENDM
         mouseError DB 'El mouse no esta disponible', 0
 
         
-        numA      DW 900
-        numB      DW 999
+        numA      DW 0
+        numB      DW 0
         remainder DW ?
         output    DW 0
         yCoord    DW 0
         xCoord    DW 0
         
-        numAString     DB '000',         0
-        numBString     DB '000',         0
-        operatorString DB '-',           0
-        outputString   DB '00000',       0
+        numAString     DB '000',         0DH
+        numBString     DB '000',         0DH
+        operatorString DB '-',           0DH
+        outputString   DB '00000',       0DH
         
-        overflowString  DB '       ', 0
-        maxNum1         DB '0065536',   0
-        maxNum2         DB '0131072',   0
-        maxNum3         DB '0196608',   0
-        maxNum4         DB '0262144',   0
-        maxNum5         DB '0327680',   0
-        maxNum6         DB '0393216',   0
-        maxNum7         DB '0458752',   0
-        maxNum8         DB '0524288',   0
-        maxNum9         DB '0589824',   0
-        maxNumA         DB '0655360',   0
-        maxNumB         DB '0720896',   0
-        maxNumC         DB '0786432',   0
-        maxNumD         DB '0851968',   0 
-        maxNumE         DB '0917504',   0
-        maxNumF         DB '0983040',   0
+        overflowString  DB '       ',    0DH
+        maxNum1         DB '0065536',    0DH
+        maxNum2         DB '0131072',    0DH
+        maxNum3         DB '0196608',    0DH
+        maxNum4         DB '0262144',    0DH
+        maxNum5         DB '0327680',    0DH
+        maxNum6         DB '0393216',    0DH
+        maxNum7         DB '0458752',    0DH
+        maxNum8         DB '0524288',    0DH
+        maxNum9         DB '0589824',    0DH
+        maxNumA         DB '0655360',    0DH
+        maxNumB         DB '0720896',    0DH
+        maxNumC         DB '0786432',    0DH
+        maxNumD         DB '0851968',    0DH 
+        maxNumE         DB '0917504',    0DH
+        maxNumF         DB '0983040',    0DH
         
         
         operatorASCII DB ?
@@ -788,8 +797,19 @@ main PROC
         CALL printInstructions
         CALL getInputA
         CALL getOperator
-        CALL getInputB
-        printForwards "=0", 2, 12
+        CALL getInputB    
+        
+        ;; PRINT EQUALS SIGN.
+        MOV AH, 02H
+        MOV AL, '='
+        MOV BH, 00
+        MOV BL, 0F0H
+        MOV DH, 2
+        MOV DL, 12
+        INT 10H
+        MOV AH, 0EH
+        INT 10H  
+        
         CALL inputStringToNum  
         CALL printOperation
         RET
@@ -830,7 +850,9 @@ printInstructions ENDP
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the first string number
 getInputA PROC
-        handleMouse 1, numAString, 2, 4
+        handleMouse 1, numAString
+        printForwards numAString, 2, 4 
+        
         RET
 getInputA ENDP 
 
@@ -841,7 +863,8 @@ getInputA ENDP
 ;;;          The operator must be one of: + / * - %
 ;;; TODO: ENFORCE THAT OPERATOR IS A VALID ONE. SOLVED WITH MOUSE INPUT.
 getOperator PROC
-        handleMouse 0, operatorString, 2, 7
+        handleMouse 0, operatorString
+        printForwards operatorString, 2, 8
         RET
 getOperator ENDP
 
@@ -851,7 +874,8 @@ getOperator ENDP
 ;;; EFFECTS: Gets from the keyboard the 3 character input. 
 ;;; Gets the second string number
 getInputB PROC
-        handleMouse 1, numAString, 2, 8
+        handleMouse 1, numBString
+        printForwards numBString, 2, 9
         RET
 getInputB ENDP
 
@@ -863,8 +887,8 @@ getInputB ENDP
 ;;; EFFECTS : Transform a string of digits to its numerical representation. 
 ;;; Transform the number strings to numbers.
 inputStringToNum PROC
-        stringToNum numAString, 3, numA
-        stringToNum numBString, 3, numB
+        stringToNum numAString, numA
+        stringToNum numBString, numB
         RET
 inputStringToNum ENDP
         
