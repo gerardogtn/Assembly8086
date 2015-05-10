@@ -513,7 +513,8 @@ handleMouse MACRO isNum, numString, R, C
         INT 33H
 
         ;; IF isNum is 0. Get Number. Else, operator.
-        CMP isNum, 0
+        MOV AL, isNum
+        CMP AL, 0
         JNE getOperator
 
 
@@ -524,12 +525,14 @@ getNumber:
         JG  exit
 
         ;; GET MOUSE COORDINATES
-        MOV AX, 03
+        MOV AH, 00
+        MOV AL, 03H
         MOV BX, 0
         INT 33H
         CMP BX, 1
         JNE getNumber
-
+          
+        INT 3  
         ;; GET COLUMN. 
         MOV AX, xCoord
         MOV DX, 0
@@ -699,8 +702,10 @@ MNA:
         printForwards mouseError, 2, 5
         RET
 
-exit:
-        printForwards numString, R, C
+exit:          
+        MOV AX, R
+        MOV BX, C
+        printForwards numString, AX, BX
 
 handleMouse ENDM
         
