@@ -78,14 +78,18 @@ printNum ENDM
 stringToNum MACRO string, integer
         LOCAL exit
         LOCAL start
-
-start:  
+            
+            
         MOV SI, 0
-        MOV BX, 10
-        MOV AX, string[SI]
+        MOV BX, 10    
+start:  
+        
+        MOV AL, string[SI]
         CMP AL, 'A'
         JE exit
-
+        
+        SUB AL, 30H
+        MOV AH, 00
         MOV DI, AX
         MOV AX, integer
         MUL BX
@@ -104,7 +108,7 @@ stringToNum ENDM
 
         .DATA
         numAString DB  "999", 'A'
-        numA       DB 0
+        numA       DW 0
 
 
 
@@ -113,7 +117,8 @@ stringToNum ENDM
         main PROC
         printForwards numAString, 2, 2
         printNum      numA, 3, 2, 3
-
+              
+        INT 3      
         stringToNum numAString, numA
         printForwards numAString, 4, 2
         printNum      numA, 5, 2, 3
